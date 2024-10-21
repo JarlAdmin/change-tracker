@@ -17,6 +17,7 @@ import { AlertCircle, X } from "lucide-react";
 import { Change } from '../types/change';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import imageCompression from 'browser-image-compression'; // You'll need to install this package
 
 interface AddChangeDialogProps {
   isOpen: boolean;
@@ -33,18 +34,40 @@ const AddChangeDialog: React.FC<AddChangeDialogProps> = ({ isOpen, onClose, onAd
   const [screenshots, setScreenshots] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  const handlePaste = useCallback((event: ClipboardEvent) => {
+  const compressImage = async (imageFile: File): Promise<string> => {
+    const options = {
+      maxSizeMB: 1,
+      maxWidthOrHeight: 1920,
+      useWebWorker: true
+    };
+    
+    try {
+      const compressedFile = await imageCompression(imageFile, options);
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target?.result as string);
+        reader.onerror = (e) => reject(e);
+        reader.readAsDataURL(compressedFile);
+      });
+    } catch (error) {
+      console.error("Error compressing image:", error);
+      throw error;
+    }
+  };
+
+  const handlePaste = useCallback(async (event: ClipboardEvent) => {
     const items = event.clipboardData?.items;
     if (items) {
       for (let i = 0; i < items.length; i++) {
         if (items[i].type.indexOf('image') !== -1) {
           const blob = items[i].getAsFile();
           if (blob) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-              setScreenshots(prev => [...prev, e.target?.result as string]);
-            };
-            reader.readAsDataURL(blob);
+            try {
+              const compressedImage = await compressImage(blob);
+              setScreenshots(prev => [...prev, compressedImage]);
+            } catch (error) {
+              console.error("Error processing pasted image:", error);
+            }
           }
         }
       }
