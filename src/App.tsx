@@ -15,12 +15,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import AddChangeForm from './components/AddChangeForm';
-
-interface Change {
-  id: number;
-  description: string;
-  date: string;
-}
+import { Change } from './types/change';
 
 const App: React.FC = () => {
   const [changes, setChanges] = useState<Change[]>([]);
@@ -38,9 +33,9 @@ const App: React.FC = () => {
     }
   };
 
-  const addChange = async (description: string) => {
+  const addChange = async (changeData: Omit<Change, 'id' | 'date'>) => {
     try {
-      const response = await axios.post('http://10.85.0.100/api/changes', { description });
+      const response = await axios.post('http://10.85.0.100/api/changes', changeData);
       setChanges([response.data, ...changes]);
     } catch (error) {
       console.error('Error adding change:', error);
@@ -54,7 +49,19 @@ const App: React.FC = () => {
     },
     {
       accessorKey: "description",
-      header: "Description",
+      header: "Change Details",
+    },
+    {
+      accessorKey: "category",
+      header: "Category",
+    },
+    {
+      accessorKey: "service",
+      header: "Service",
+    },
+    {
+      accessorKey: "username",
+      header: "Username",
     },
     {
       accessorKey: "date",
