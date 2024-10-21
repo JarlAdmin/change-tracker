@@ -1,7 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import ChangeTable from '././components/ChangeTable';
-import AddChangeForm from '././components/AddChangeForm';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import AddChangeForm from './components/AddChangeForm';
 
 interface Change {
   id: number;
@@ -18,7 +31,7 @@ const App: React.FC = () => {
 
   const fetchChanges = async () => {
     try {
-      const response = await axios.get('/api/changes');
+      const response = await axios.get('http://localhost:3001/api/changes');
       setChanges(response.data);
     } catch (error) {
       console.error('Error fetching changes:', error);
@@ -27,18 +40,81 @@ const App: React.FC = () => {
 
   const addChange = async (description: string) => {
     try {
-      const response = await axios.post('/api/changes', { description });
-      setChanges([...changes, response.data]);
+      const response = await axios.post('http://localhost:3001/api/changes', { description });
+      setChanges([response.data, ...changes]);
     } catch (error) {
       console.error('Error adding change:', error);
     }
   };
 
+  const columns: ColumnDef<Change>[] = [
+    {
+      accessorKey: "id",
+      header: "ID",
+    },
+    {
+      accessorKey: "description",
+      header: "Description",
+    },
+    {
+      accessorKey: "date",
+      header: "Date",
+      cell: ({ row }) => new Date(row.getValue("date")).toLocaleString(),
+    },
+  ];
+
+  const table = useReactTable({
+    data: changes,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  });
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Change Tracker</h1>
       <AddChangeForm onAddChange={addChange} />
-      <ChangeTable changes={changes} />
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="h-24 text-center">
+                  No results.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 };

@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 interface AddChangeFormProps {
   onAddChange: (description: string) => void;
@@ -16,17 +18,15 @@ const AddChangeForm: React.FC<AddChangeFormProps> = ({ onAddChange }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mb-4">
-      <input
+    <form onSubmit={handleSubmit} className="mb-4 flex gap-2">
+      <Input
         type="text"
         value={description}
         onChange={(e) => setDescription(e.target.value)}
         placeholder="Enter change description"
-        className="border p-2 mr-2"
+        className="flex-grow"
       />
-      <button type="submit" className="bg-blue-500 text-white p-2 rounded">
-        Add Change
-      </button>
+      <Button type="submit">Add Change</Button>
     </form>
   );
 };
