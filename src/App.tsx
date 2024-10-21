@@ -15,6 +15,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import AddChangeForm from './components/AddChangeForm';
+import RowActions from './components/RowActions';
 import { Change } from './types/change';
 
 const App: React.FC = () => {
@@ -48,7 +49,7 @@ const App: React.FC = () => {
       header: "ID",
     },
     {
-      accessorKey: "change_details",  // Changed from 'description' to 'change_details'
+      accessorKey: "change_details",
       header: "Change Details",
     },
     {
@@ -67,6 +68,10 @@ const App: React.FC = () => {
       accessorKey: "date",
       header: "Date",
       cell: ({ row }) => new Date(row.getValue("date")).toLocaleString(),
+    },
+    {
+      id: "actions",
+      cell: ({ row }) => <RowActions change={row.original} />,
     },
   ];
 
