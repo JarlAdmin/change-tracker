@@ -34,7 +34,7 @@ const App: React.FC = () => {
     }
   };
 
-  const addChange = async (changeData: Omit<Change, 'id' | 'date'>) => {
+  const addChange = async (changeData: Omit<Change, 'id'>) => {
     try {
       const response = await axios.post('http://10.85.0.100/api/changes', changeData);
       setChanges([response.data, ...changes]);
@@ -54,7 +54,10 @@ const App: React.FC = () => {
 
   const editChange = async (id: number, updatedChange: Omit<Change, 'id' | 'date'>) => {
     try {
-      const response = await axios.put(`http://10.85.0.100/api/changes/${id}`, updatedChange);
+      const response = await axios.put(`http://10.85.0.100/api/changes/${id}`, {
+        ...updatedChange,
+        date: new Date().toISOString() // Add the current date
+      });
       setChanges(changes.map(change => change.id === id ? response.data : change));
     } catch (error) {
       console.error('Error editing change:', error);
