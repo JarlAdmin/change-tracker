@@ -16,7 +16,13 @@ const AddChangeForm: React.FC<AddChangeFormProps> = ({ onAddChange }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (change_details.trim() && category.trim() && service.trim() && username.trim()) {
-      onAddChange({ change_details, category, service, username });
+      onAddChange({ 
+        change_details, 
+        category, 
+        service, 
+        username,
+        screenshots: [] // Add this line
+      });
       setChangeDetails('');
       setCategory('');
       setService('');

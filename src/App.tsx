@@ -36,9 +36,12 @@ const App: React.FC = () => {
     }
   };
 
-  const addChange = async (changeData: Omit<Change, 'id'>) => {
+  const addChange = async (changeData: Omit<Change, 'id' | 'date'>) => {
     try {
-      const response = await axios.post('http://10.85.0.100/api/changes', changeData);
+      const response = await axios.post('http://10.85.0.100/api/changes', {
+        ...changeData,
+        date: new Date().toISOString() // Add the current date
+      });
       setChanges([response.data, ...changes]);
     } catch (error) {
       console.error('Error adding change:', error);

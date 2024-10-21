@@ -50,7 +50,7 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
         service,
         username: userName,
         date: changeDate.toISOString(),
-        screenshots,
+        screenshots: screenshots,
       });
       onClose();
     }

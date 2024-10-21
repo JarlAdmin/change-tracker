@@ -97,7 +97,7 @@ const AddChangeDialog: React.FC<AddChangeDialogProps> = ({ isOpen, onClose, onAd
       service: category === 'General Changes' ? 'General Change' : service,
       date: changeDate.toISOString(),
       username: userName,
-      screenshots,
+      screenshots: screenshots,
     });
     handleClose();
   };
