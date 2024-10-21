@@ -17,9 +17,11 @@ import {
 import AddChangeDialog from './components/AddChangeDialog';
 import RowActions from './components/RowActions';
 import { Change } from './types/change';
+import { Button } from "./components/ui/button";
 
 const App: React.FC = () => {
   const [changes, setChanges] = useState<Change[]>([]);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
   useEffect(() => {
     fetchChanges();
@@ -106,7 +108,12 @@ const App: React.FC = () => {
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Change Tracker</h1>
       <div className="mb-4">
-        <AddChangeDialog onAddChange={addChange} />
+        <Button onClick={() => setIsAddDialogOpen(true)}>Add Change</Button>
+        <AddChangeDialog
+          isOpen={isAddDialogOpen}
+          onClose={() => setIsAddDialogOpen(false)}
+          onAddChange={addChange}
+        />
       </div>
       <div className="rounded-md border">
         <Table>

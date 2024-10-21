@@ -5,4 +5,5 @@ export interface Change {
   category: string;
   service: string;
   username: string;
+  screenshots?: string[];
 }
