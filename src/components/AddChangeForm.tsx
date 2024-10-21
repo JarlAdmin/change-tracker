@@ -8,16 +8,16 @@ interface AddChangeFormProps {
 }
 
 const AddChangeForm: React.FC<AddChangeFormProps> = ({ onAddChange }) => {
-  const [description, setDescription] = useState('');
+  const [change_details, setChangeDetails] = useState('');
   const [category, setCategory] = useState('');
   const [service, setService] = useState('');
   const [username, setUsername] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (description.trim() && category.trim() && service.trim() && username.trim()) {
-      onAddChange({ description, category, service, username });
-      setDescription('');
+    if (change_details.trim() && category.trim() && service.trim() && username.trim()) {
+      onAddChange({ change_details, category, service, username });
+      setChangeDetails('');
       setCategory('');
       setService('');
       setUsername('');
@@ -28,8 +28,8 @@ const AddChangeForm: React.FC<AddChangeFormProps> = ({ onAddChange }) => {
     <form onSubmit={handleSubmit} className="mb-4 flex flex-col gap-2">
       <Input
         type="text"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
+        value={change_details}
+        onChange={(e) => setChangeDetails(e.target.value)}
         placeholder="Enter change details"
       />
       <Input

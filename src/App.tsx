@@ -48,7 +48,7 @@ const App: React.FC = () => {
       header: "ID",
     },
     {
-      accessorKey: "description",
+      accessorKey: "change_details",  // Changed from 'description' to 'change_details'
       header: "Change Details",
     },
     {

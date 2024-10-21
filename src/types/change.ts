@@ -1,6 +1,6 @@
 export interface Change {
   id: number;
-  description: string;
+  change_details: string;
   date: string;
   category: string;
   service: string;
