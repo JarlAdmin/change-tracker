@@ -43,6 +43,15 @@ const App: React.FC = () => {
     }
   };
 
+  const deleteChange = async (id: number) => {
+    try {
+      await axios.delete(`http://10.85.0.100/api/changes/${id}`);
+      setChanges(changes.filter(change => change.id !== id));
+    } catch (error) {
+      console.error('Error deleting change:', error);
+    }
+  };
+
   const columns: ColumnDef<Change>[] = [
     {
       accessorKey: "id",
@@ -71,7 +80,7 @@ const App: React.FC = () => {
     },
     {
       id: "actions",
-      cell: ({ row }) => <RowActions change={row.original} />,
+      cell: ({ row }) => <RowActions change={row.original} onDelete={deleteChange} />,
     },
   ];
 
