@@ -52,6 +52,15 @@ const App: React.FC = () => {
     }
   };
 
+  const editChange = async (id: number, updatedChange: Omit<Change, 'id' | 'date'>) => {
+    try {
+      const response = await axios.put(`http://10.85.0.100/api/changes/${id}`, updatedChange);
+      setChanges(changes.map(change => change.id === id ? response.data : change));
+    } catch (error) {
+      console.error('Error editing change:', error);
+    }
+  };
+
   const columns: ColumnDef<Change>[] = [
     {
       accessorKey: "id",
@@ -80,7 +89,7 @@ const App: React.FC = () => {
     },
     {
       id: "actions",
-      cell: ({ row }) => <RowActions change={row.original} onDelete={deleteChange} />,
+      cell: ({ row }) => <RowActions change={row.original} onDelete={deleteChange} onEdit={editChange} />,
     },
   ];
 

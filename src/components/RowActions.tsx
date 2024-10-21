@@ -8,13 +8,15 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Change } from '../types/change';
+import EditChangeDialog from './EditChangeDialog';
 
 interface RowActionsProps {
   change: Change;
   onDelete: (id: number) => void;
+  onEdit: (id: number, updatedChange: Omit<Change, 'id' | 'date'>) => void;
 }
 
-const RowActions: React.FC<RowActionsProps> = ({ change, onDelete }) => {
+const RowActions: React.FC<RowActionsProps> = ({ change, onDelete, onEdit }) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -24,6 +26,7 @@ const RowActions: React.FC<RowActionsProps> = ({ change, onDelete }) => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
+        <EditChangeDialog change={change} onEditChange={onEdit} />
         <DropdownMenuItem 
           onClick={() => onDelete(change.id)}
           className="text-red-600 focus:text-red-600 focus:bg-red-50"
