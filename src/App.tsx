@@ -31,7 +31,7 @@ const App: React.FC = () => {
 
   const fetchChanges = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/api/changes');
+      const response = await axios.get('http://10.85.0.100/api/changes');
       setChanges(response.data);
     } catch (error) {
       console.error('Error fetching changes:', error);
@@ -40,7 +40,7 @@ const App: React.FC = () => {
 
   const addChange = async (description: string) => {
     try {
-      const response = await axios.post('http://localhost:3001/api/changes', { description });
+      const response = await axios.post('http://10.85.0.100/api/changes', { description });
       setChanges([response.data, ...changes]);
     } catch (error) {
       console.error('Error adding change:', error);
