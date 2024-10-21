@@ -14,7 +14,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import AddChangeForm from './components/AddChangeForm';
+import AddChangeDialog from './components/AddChangeDialog';
 import RowActions from './components/RowActions';
 import { Change } from './types/change';
 
@@ -84,7 +84,9 @@ const App: React.FC = () => {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Change Tracker</h1>
-      <AddChangeForm onAddChange={addChange} />
+      <div className="mb-4">
+        <AddChangeDialog onAddChange={addChange} />
+      </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
