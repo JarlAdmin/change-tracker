@@ -13,7 +13,7 @@ import EditChangeDialog from './EditChangeDialog';
 interface RowActionsProps {
   change: Change;
   onDelete: (id: number) => void;
-  onEdit: (id: number, updatedChange: Omit<Change, 'id' | 'date'>) => void;
+  onEdit: (id: number, updatedChange: Omit<Change, 'id'>) => void;
 }
 
 const RowActions: React.FC<RowActionsProps> = ({ change, onDelete, onEdit }) => {

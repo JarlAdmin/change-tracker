@@ -15,11 +15,12 @@ import {
 import { Change } from '../types/change';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { X } from "lucide-react";
 
 interface EditChangeDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onEditChange: (id: number, updatedChange: Omit<Change, 'id' | 'date'>) => void;
+  onEditChange: (id: number, updatedChange: Omit<Change, 'id'>) => void;
   change: Change;
 }
 
@@ -29,6 +30,7 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
   const [service, setService] = useState(change.service);
   const [changeDate, setChangeDate] = useState<Date>(new Date(change.date));
   const [userName, setUserName] = useState(change.username);
+  const [screenshots, setScreenshots] = useState<string[]>(change.screenshots || []);
 
   useEffect(() => {
     setChangeDetails(change.change_details);
@@ -36,6 +38,7 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
     setService(change.service);
     setChangeDate(new Date(change.date));
     setUserName(change.username);
+    setScreenshots(change.screenshots || []);
   }, [change]);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -46,9 +49,15 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
         category,
         service,
         username: userName,
+        date: changeDate.toISOString(),
+        screenshots,
       });
       onClose();
     }
+  };
+
+  const removeScreenshot = (index: number) => {
+    setScreenshots(prev => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -138,6 +147,25 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
               value={userName}
               onChange={(e) => setUserName(e.target.value)}
             />
+          </div>
+          <div className="space-y-2">
+            <Label>Screenshots</Label>
+            <div className="flex flex-wrap gap-2">
+              {screenshots.map((screenshot, index) => (
+                <div key={index} className="relative">
+                  <img src={screenshot} alt={`Screenshot ${index + 1}`} className="w-20 h-20 object-cover" />
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="icon"
+                    className="absolute top-0 right-0 h-6 w-6"
+                    onClick={() => removeScreenshot(index)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
           </div>
           <DialogFooter>
             <Button type="submit">Save Changes</Button>
