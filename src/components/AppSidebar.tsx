@@ -1,5 +1,5 @@
-import React from 'react';
-import { Home, Calendar, Settings, PlusCircle, List } from "lucide-react";
+import React, { useState } from 'react';
+import { Home, Calendar, Settings, PlusCircle, List, UserPlus } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -11,6 +11,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
+import AddUserDialog from './AddUserDialog';
 
 const items = [
   {
@@ -40,7 +41,18 @@ const items = [
   },
 ];
 
-export function AppSidebar() {
+interface AppSidebarProps {
+  onUserAdded: () => Promise<void>;
+}
+
+export function AppSidebar({ onUserAdded }: AppSidebarProps) {
+  const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
+
+  const handleUserAdded = async () => {
+    await onUserAdded();
+    setIsAddUserDialogOpen(false);
+  };
+
   return (
     <Sidebar>
       <SidebarContent>
@@ -59,10 +71,21 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              <SidebarMenuItem>
+                <SidebarMenuButton onClick={() => setIsAddUserDialogOpen(true)}>
+                  <UserPlus className="mr-2 h-4 w-4" />
+                  <span>Add User</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <AddUserDialog
+        isOpen={isAddUserDialogOpen}
+        onClose={() => setIsAddUserDialogOpen(false)}
+        onUserAdded={handleUserAdded}
+      />
     </Sidebar>
   );
 }

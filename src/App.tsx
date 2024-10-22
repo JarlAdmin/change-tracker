@@ -41,9 +41,20 @@ const App: React.FC = () => {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [serviceFilter, setServiceFilter] = useState<string>('all');
+  const [users, setUsers] = useState<string[]>(['Admin']);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/api/users`);
+      setUsers(['Admin', ...response.data.map((user: any) => user.username)]);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  };
 
   useEffect(() => {
     fetchChanges();
+    fetchUsers();
   }, []);
 
   const fetchChanges = async () => {
@@ -261,7 +272,7 @@ const App: React.FC = () => {
   return (
     <SidebarProvider>
       <div className="flex h-screen">
-        <AppSidebar />
+        <AppSidebar onUserAdded={fetchUsers} />
         <main className="flex-1 overflow-y-auto p-4">
           <SidebarTrigger />
           <h1 className="text-2xl font-bold mb-4">Change Tracker</h1>

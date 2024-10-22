@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
@@ -16,6 +16,7 @@ import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { AlertCircle, X } from "lucide-react";
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import axios from 'axios';
 
 interface AddChangeDialogProps {
   isOpen: boolean;
@@ -28,9 +29,23 @@ const AddChangeDialog: React.FC<AddChangeDialogProps> = ({ isOpen, onClose, onAd
   const [category, setCategory] = useState('');
   const [service, setService] = useState('');
   const [changeDate, setChangeDate] = useState<Date>(new Date());
-  const [userName, setUserName] = useState('');
+  const [userName, setUserName] = useState('Admin');
   const [screenshots, setScreenshots] = useState<File[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [users, setUsers] = useState<string[]>(['Admin']);
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await axios.get('http://10.85.0.100:3001/api/users');
+      setUsers(['Admin', ...response.data.map((user: any) => user.username)]);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -74,7 +89,7 @@ const AddChangeDialog: React.FC<AddChangeDialogProps> = ({ isOpen, onClose, onAd
     setCategory('');
     setService('');
     setChangeDate(new Date());
-    setUserName('');
+    setUserName('Admin');
     setScreenshots([]);
     setError(null);
     onClose();
@@ -170,12 +185,18 @@ const AddChangeDialog: React.FC<AddChangeDialogProps> = ({ isOpen, onClose, onAd
           </div>
           <div className="space-y-2">
             <Label htmlFor="user-name">User Name*</Label>
-            <Input
-              id="user-name"
-              placeholder="Enter your name"
-              value={userName}
-              onChange={(e) => setUserName(e.target.value)}
-            />
+            <Select value={userName} onValueChange={setUserName}>
+              <SelectTrigger id="user-name">
+                <SelectValue placeholder="Select User" />
+              </SelectTrigger>
+              <SelectContent>
+                {users.map((user) => (
+                  <SelectItem key={user} value={user}>
+                    {user}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-2">
             <Label htmlFor="screenshots">Screenshots</Label>
