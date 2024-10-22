@@ -15,6 +15,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   SortingState,
+  getFilteredRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 import AddChangeDialog from './components/AddChangeDialog';
@@ -22,6 +23,7 @@ import RowActions from './components/RowActions';
 import { Change } from './types/change';
 import { Button } from "./components/ui/button";
 import { ArrowUpDown } from "lucide-react";
+import { Input } from "./components/ui/input";
 import { toast } from 'react-hot-toast'; // Make sure to install this package if you haven't already
 
 const API_BASE_URL = 'http://10.85.0.100:3001'; // Make sure this matches your server's address and port
@@ -30,6 +32,7 @@ const App: React.FC = () => {
   const [changes, setChanges] = useState<Change[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [globalFilter, setGlobalFilter] = useState('');
 
   useEffect(() => {
     fetchChanges();
@@ -192,23 +195,33 @@ const App: React.FC = () => {
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
     onSortingChange: setSorting,
+    onGlobalFilterChange: setGlobalFilter,
+    globalFilterFn: "includesString",
     state: {
       sorting,
+      globalFilter,
     },
   });
 
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Change Tracker</h1>
-      <div className="mb-4">
+      <div className="mb-4 flex justify-between items-center">
         <Button onClick={() => setIsAddDialogOpen(true)}>Add Change</Button>
-        <AddChangeDialog
-          isOpen={isAddDialogOpen}
-          onClose={() => setIsAddDialogOpen(false)}
-          onAddChange={addChange}
+        <Input
+          placeholder="Search all columns..."
+          value={globalFilter ?? ""}
+          onChange={(event) => setGlobalFilter(event.target.value)}
+          className="max-w-sm"
         />
       </div>
+      <AddChangeDialog
+        isOpen={isAddDialogOpen}
+        onClose={() => setIsAddDialogOpen(false)}
+        onAddChange={addChange}
+      />
       <div className="rounded-md border">
         <Table>
           <TableHeader>
