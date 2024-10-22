@@ -16,7 +16,6 @@ import { Change } from '../types/change';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { X } from "lucide-react";
-import fallbackImage from '../assets/fallback-image.png'; // Add a fallback image to your assets
 
 interface EditChangeDialogProps {
   isOpen: boolean;
@@ -38,16 +37,12 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
     console.log('Change object:', change);
     console.log('Screenshots:', change.screenshots);
     
-    // Add a small delay before setting the screenshots
-    setTimeout(() => {
-      setScreenshots(change.screenshots);
-    }, 100);
-    
     setChangeDetails(change.change_details);
     setCategory(change.category);
     setService(change.service);
     setChangeDate(new Date(change.date));
     setUserName(change.username);
+    setScreenshots(change.screenshots);
     setNewScreenshots([]);
   }, [change]);
 
@@ -181,7 +176,6 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
                       onError={(e) => {
                         console.error('Image failed to load:', imageUrl);
                         console.error('Error event:', e);
-                        e.currentTarget.src = fallbackImage; // Set fallback image
                       }}
                       onLoad={() => console.log('Image loaded successfully:', imageUrl)}
                     />
