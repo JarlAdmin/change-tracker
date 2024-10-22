@@ -22,7 +22,7 @@ import AddChangeDialog from './components/AddChangeDialog';
 import RowActions from './components/RowActions';
 import { Change } from './types/change';
 import { Button } from "./components/ui/button";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, RotateCcw } from "lucide-react";
 import { Input } from "./components/ui/input";
 import { Checkbox } from "./components/ui/checkbox";
 import CategoryFilter from './components/CategoryFilter';
@@ -101,6 +101,12 @@ const App: React.FC = () => {
       }
     }
   }, []);
+
+  const resetFilters = () => {
+    setGlobalFilter('');
+    setCategoryFilter('all');
+    setServiceFilter('all');
+  };
 
   const columns: ColumnDef<Change>[] = [
     {
@@ -271,6 +277,14 @@ const App: React.FC = () => {
             value={serviceFilter}
             onChange={setServiceFilter}
           />
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={resetFilters}
+            title="Reset filters"
+          >
+            <RotateCcw className="h-4 w-4" />
+          </Button>
         </div>
         <Button onClick={() => setIsAddDialogOpen(true)}>Add Change</Button>
       </div>
