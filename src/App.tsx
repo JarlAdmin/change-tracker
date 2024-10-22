@@ -15,7 +15,6 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   SortingState,
-  getFilteredRowModel,
   useReactTable,
   RowSelectionState,
 } from "@tanstack/react-table";
@@ -38,8 +37,8 @@ const App: React.FC = () => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState('');
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
-  const [categoryFilter, setCategoryFilter] = useState<string>('');
-  const [serviceFilter, setServiceFilter] = useState<string>('');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [serviceFilter, setServiceFilter] = useState<string>('all');
 
   useEffect(() => {
     fetchChanges();
@@ -68,14 +67,13 @@ const App: React.FC = () => {
       if (axios.isAxiosError(error) && error.response) {
         console.error('Server response:', error.response.data);
       }
-      // Log the entire error object
       console.error('Full error object:', JSON.stringify(error, null, 2));
     }
   };
 
   const deleteChange = async (id: number) => {
     try {
-      await axios.delete(`http://10.85.0.100/api/changes/${id}`);
+      await axios.delete(`${API_BASE_URL}/api/changes/${id}`);
       setChanges(changes.filter(change => change.id !== id));
     } catch (error) {
       console.error('Error deleting change:', error);
@@ -102,7 +100,7 @@ const App: React.FC = () => {
         toast.error('An unexpected error occurred while updating the change');
       }
     }
-  }, [API_BASE_URL]);
+  }, []);
 
   const columns: ColumnDef<Change>[] = [
     {
@@ -215,37 +213,30 @@ const App: React.FC = () => {
     },
   ];
 
+  const filteredChanges = useMemo(() => {
+    return changes.filter(change => {
+      const matchesCategory = categoryFilter === 'all' || change.category === categoryFilter;
+      const matchesService = serviceFilter === 'all' || change.service === serviceFilter;
+      const matchesGlobalFilter = 
+        change.change_details.toLowerCase().includes(globalFilter.toLowerCase()) ||
+        change.category.toLowerCase().includes(globalFilter.toLowerCase()) ||
+        change.service.toLowerCase().includes(globalFilter.toLowerCase()) ||
+        change.username.toLowerCase().includes(globalFilter.toLowerCase());
+      return matchesCategory && matchesService && matchesGlobalFilter;
+    });
+  }, [changes, categoryFilter, serviceFilter, globalFilter]);
+
   const table = useReactTable({
-    data: changes,
+    data: filteredChanges,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     onSortingChange: setSorting,
-    onGlobalFilterChange: setGlobalFilter,
     onRowSelectionChange: setRowSelection,
-    globalFilterFn: "includesString",
     state: {
       sorting,
-      globalFilter,
       rowSelection,
-      columnFilters: [
-        { id: 'category', value: categoryFilter },
-        { id: 'service', value: serviceFilter },
-      ],
-    },
-    filterFns: {
-      categoryFilter: (row, columnId, filterValue) => {
-        if (filterValue === '' || filterValue === 'all') return true;
-        const cellValue = row.getValue(columnId) as string;
-        return cellValue === filterValue;
-      },
-      serviceFilter: (row, columnId, filterValue) => {
-        if (filterValue === '' || filterValue === 'all') return true;
-        const cellValue = row.getValue(columnId) as string;
-        return cellValue === filterValue;
-      },
     },
   });
 
@@ -266,25 +257,19 @@ const App: React.FC = () => {
         <div className="flex items-center space-x-2">
           <Input
             placeholder="Search all columns..."
-            value={globalFilter ?? ""}
+            value={globalFilter}
             onChange={(event) => setGlobalFilter(event.target.value)}
             className="max-w-sm"
           />
           <CategoryFilter
             categories={uniqueCategories}
             value={categoryFilter}
-            onChange={(value) => {
-              setCategoryFilter(value);
-              table.getColumn('category')?.setFilterValue(value === 'all' ? '' : value);
-            }}
+            onChange={setCategoryFilter}
           />
           <ServiceFilter
             services={uniqueServices}
             value={serviceFilter}
-            onChange={(value) => {
-              setServiceFilter(value);
-              table.getColumn('service')?.setFilterValue(value === 'all' ? '' : value);
-            }}
+            onChange={setServiceFilter}
           />
         </div>
         <Button onClick={() => setIsAddDialogOpen(true)}>Add Change</Button>
