@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import {
   Table,
@@ -26,6 +26,7 @@ import { Button } from "./components/ui/button";
 import { ArrowUpDown } from "lucide-react";
 import { Input } from "./components/ui/input";
 import { Checkbox } from "./components/ui/checkbox";
+import CategoryFilter from './components/CategoryFilter';
 import { toast } from 'react-hot-toast';
 
 const API_BASE_URL = 'http://10.85.0.100:3001';
@@ -36,6 +37,7 @@ const App: React.FC = () => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState('');
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [categoryFilter, setCategoryFilter] = useState<string>('');
 
   useEffect(() => {
     fetchChanges();
@@ -227,18 +229,37 @@ const App: React.FC = () => {
       globalFilter,
       rowSelection,
     },
+    filterFns: {
+      categoryFilter: (row, columnId, filterValue: string) => {
+        if (filterValue === '') return true;
+        return row.getValue(columnId) === filterValue;
+      },
+    },
   });
+
+  const uniqueCategories = useMemo(() => {
+    const categories = new Set(changes.map(change => change.category));
+    return ['', ...Array.from(categories)];
+  }, [changes]);
 
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Change Tracker</h1>
       <div className="mb-4 flex justify-between items-center">
-        <div className="w-1/3">
+        <div className="flex items-center space-x-2">
           <Input
             placeholder="Search all columns..."
             value={globalFilter ?? ""}
             onChange={(event) => setGlobalFilter(event.target.value)}
             className="max-w-sm"
+          />
+          <CategoryFilter
+            categories={uniqueCategories}
+            value={categoryFilter}
+            onChange={(value) => {
+              setCategoryFilter(value);
+              table.getColumn('category')?.setFilterValue(value);
+            }}
           />
         </div>
         <Button onClick={() => setIsAddDialogOpen(true)}>Add Change</Button>
