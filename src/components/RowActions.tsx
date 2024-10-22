@@ -9,6 +9,7 @@ import {
 } from "./ui/dropdown-menu";
 import { Change } from '../types/change';
 import EditChangeDialog from './EditChangeDialog';
+import ViewChangeDialog from './ViewChangeDialog';
 
 interface RowActionsProps {
   change: Change;
@@ -18,6 +19,7 @@ interface RowActionsProps {
 
 const RowActions: React.FC<RowActionsProps> = ({ change, onDelete, onEdit }) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
 
   const handleEdit = (id: number, updatedChange: FormData) => {
     onEdit(id, updatedChange);
@@ -34,6 +36,9 @@ const RowActions: React.FC<RowActionsProps> = ({ change, onDelete, onEdit }) => 
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={() => setIsViewDialogOpen(true)}>
+            View Change
+          </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)}>
             Edit
           </DropdownMenuItem>
@@ -49,6 +54,11 @@ const RowActions: React.FC<RowActionsProps> = ({ change, onDelete, onEdit }) => 
         isOpen={isEditDialogOpen}
         onClose={() => setIsEditDialogOpen(false)}
         onEditChange={handleEdit}
+        change={change}
+      />
+      <ViewChangeDialog
+        isOpen={isViewDialogOpen}
+        onClose={() => setIsViewDialogOpen(false)}
         change={change}
       />
     </>
