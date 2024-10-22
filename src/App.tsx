@@ -127,6 +127,11 @@ const App: React.FC = () => {
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    initialState: {
+      pagination: {
+        pageSize: 10, // or whatever number you prefer
+      },
+    },
   });
 
   return (
