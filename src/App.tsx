@@ -17,6 +17,7 @@ import {
   SortingState,
   getFilteredRowModel,
   useReactTable,
+  RowSelectionState,
 } from "@tanstack/react-table";
 import AddChangeDialog from './components/AddChangeDialog';
 import RowActions from './components/RowActions';
@@ -24,6 +25,7 @@ import { Change } from './types/change';
 import { Button } from "./components/ui/button";
 import { ArrowUpDown } from "lucide-react";
 import { Input } from "./components/ui/input";
+import { Checkbox } from "./components/ui/checkbox";
 import { toast } from 'react-hot-toast'; // Make sure to install this package if you haven't already
 
 const API_BASE_URL = 'http://10.85.0.100:3001'; // Make sure this matches your server's address and port
@@ -33,6 +35,7 @@ const App: React.FC = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState('');
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
   useEffect(() => {
     fetchChanges();
@@ -98,6 +101,25 @@ const App: React.FC = () => {
   };
 
   const columns: ColumnDef<Change>[] = [
+    {
+      id: "select",
+      header: ({ table }) => (
+        <Checkbox
+          checked={table.getIsAllPageRowsSelected()}
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
     {
       accessorKey: "id",
       header: ({ column }) => {
@@ -198,10 +220,12 @@ const App: React.FC = () => {
     getFilteredRowModel: getFilteredRowModel(),
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
+    onRowSelectionChange: setRowSelection,
     globalFilterFn: "includesString",
     state: {
       sorting,
       globalFilter,
+      rowSelection,
     },
   });
 
@@ -224,6 +248,10 @@ const App: React.FC = () => {
         onClose={() => setIsAddDialogOpen(false)}
         onAddChange={addChange}
       />
+      <div className="flex-1 text-sm text-muted-foreground mb-2">
+        {table.getFilteredSelectedRowModel().rows.length} of{" "}
+        {table.getFilteredRowModel().rows.length} row(s) selected.
+      </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
