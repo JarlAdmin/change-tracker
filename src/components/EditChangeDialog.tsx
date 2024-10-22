@@ -34,12 +34,19 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
   const [newScreenshots, setNewScreenshots] = useState<File[]>([]);
 
   useEffect(() => {
+    console.log('Change object:', change);
+    console.log('Screenshots:', change.screenshots);
+    
+    // Add a small delay before setting the screenshots
+    setTimeout(() => {
+      setScreenshots(change.screenshots);
+    }, 100);
+    
     setChangeDetails(change.change_details);
     setCategory(change.category);
     setService(change.service);
     setChangeDate(new Date(change.date));
     setUserName(change.username);
-    setScreenshots(change.screenshots);
     setNewScreenshots([]);
   }, [change]);
 
@@ -161,24 +168,33 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
           <div className="space-y-2">
             <Label htmlFor="screenshots">Existing Screenshots</Label>
             <div className="flex flex-wrap gap-2">
-              {screenshots.map((screenshot, index) => (
-                <div key={index} className="relative">
-                  <img 
-                    src={screenshot.startsWith('http') ? screenshot : `http://10.85.0.100${screenshot}`} 
-                    alt={`Screenshot ${index + 1}`} 
-                    className="w-20 h-20 object-cover" 
-                  />
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="icon"
-                    className="absolute top-0 right-0 h-6 w-6"
-                    onClick={() => removeScreenshot(index)}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
+              {screenshots.map((screenshot, index) => {
+                const imageUrl = screenshot.startsWith('http') ? screenshot : `http://10.85.0.100${screenshot}`;
+                console.log('Loading image:', imageUrl);
+                return (
+                  <div key={index} className="relative">
+                    <img 
+                      src={imageUrl}
+                      alt={`Screenshot ${index + 1}`} 
+                      className="w-20 h-20 object-cover" 
+                      onError={(e) => {
+                        console.error('Image failed to load:', imageUrl);
+                        console.error('Error event:', e);
+                      }}
+                      onLoad={() => console.log('Image loaded successfully:', imageUrl)}
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-0 right-0 h-6 w-6"
+                      onClick={() => removeScreenshot(index)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                );
+              })}
             </div>
           </div>
           <div className="space-y-2">

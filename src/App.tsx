@@ -20,6 +20,8 @@ import { Change } from './types/change';
 import { Button } from "./components/ui/button";
 import { toast } from 'react-hot-toast'; // Make sure to install this package if you haven't already
 
+const API_BASE_URL = 'http://10.85.0.100:3001'; // Make sure this is correct
+
 const App: React.FC = () => {
   const [changes, setChanges] = useState<Change[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -30,7 +32,7 @@ const App: React.FC = () => {
 
   const fetchChanges = async () => {
     try {
-      const response = await axios.get('http://10.85.0.100/api/changes');
+      const response = await axios.get(`${API_BASE_URL}/api/changes`);
       setChanges(response.data);
     } catch (error) {
       console.error('Error fetching changes:', error);
@@ -39,7 +41,7 @@ const App: React.FC = () => {
 
   const addChange = async (changeData: FormData) => {
     try {
-      const response = await axios.post('http://10.85.0.100/api/changes', changeData, {
+      const response = await axios.post(`${API_BASE_URL}/api/changes`, changeData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -65,7 +67,7 @@ const App: React.FC = () => {
   const editChange = async (id: number, updatedChange: FormData) => {
     try {
       console.log('Sending edit request:', { id, ...Object.fromEntries(updatedChange) });
-      const response = await axios.put(`http://10.85.0.100/api/changes/${id}`, updatedChange, {
+      const response = await axios.put(`${API_BASE_URL}/api/changes/${id}`, updatedChange, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
