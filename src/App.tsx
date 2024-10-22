@@ -26,9 +26,9 @@ import { Button } from "./components/ui/button";
 import { ArrowUpDown } from "lucide-react";
 import { Input } from "./components/ui/input";
 import { Checkbox } from "./components/ui/checkbox";
-import { toast } from 'react-hot-toast'; // Make sure to install this package if you haven't already
+import { toast } from 'react-hot-toast';
 
-const API_BASE_URL = 'http://10.85.0.100:3001'; // Make sure this matches your server's address and port
+const API_BASE_URL = 'http://10.85.0.100:3001';
 
 const App: React.FC = () => {
   const [changes, setChanges] = useState<Change[]>([]);
