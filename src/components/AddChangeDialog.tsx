@@ -29,10 +29,10 @@ const AddChangeDialog: React.FC<AddChangeDialogProps> = ({ isOpen, onClose, onAd
   const [category, setCategory] = useState('');
   const [service, setService] = useState('');
   const [changeDate, setChangeDate] = useState<Date>(new Date());
-  const [userName, setUserName] = useState('Admin');
+  const [userId, setUserId] = useState<number | null>(null);
   const [screenshots, setScreenshots] = useState<File[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [users, setUsers] = useState<string[]>(['Admin']);
+  const [users, setUsers] = useState<Array<{ id: number, username: string }>>([]);
 
   useEffect(() => {
     fetchUsers();
@@ -41,7 +41,12 @@ const AddChangeDialog: React.FC<AddChangeDialogProps> = ({ isOpen, onClose, onAd
   const fetchUsers = async () => {
     try {
       const response = await axios.get('http://10.85.0.100:3001/api/users');
-      setUsers(['Admin', ...response.data.map((user: any) => user.username)]);
+      setUsers(response.data);
+      // Set Admin as default user
+      const adminUser = response.data.find((user: { username: string }) => user.username === 'Admin');
+      if (adminUser) {
+        setUserId(adminUser.id);
+      }
     } catch (error) {
       console.error('Error fetching users:', error);
     }
@@ -61,8 +66,8 @@ const AddChangeDialog: React.FC<AddChangeDialogProps> = ({ isOpen, onClose, onAd
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!changeDetails.trim() || !category || !userName.trim()) {
-      setError("Please fill in all required fields (Change Details, Category, and User Name).");
+    if (!changeDetails.trim() || !category || !userId) {
+      setError("Please fill in all required fields (Change Details, Category, and User).");
       return;
     }
     if (category !== 'General Changes' && !service) {
@@ -75,7 +80,7 @@ const AddChangeDialog: React.FC<AddChangeDialogProps> = ({ isOpen, onClose, onAd
     formData.append('category', category);
     formData.append('service', category === 'General Changes' ? 'General Change' : service);
     formData.append('date', changeDate.toISOString());
-    formData.append('username', userName);
+    formData.append('user_id', userId.toString());
     screenshots.forEach(file => formData.append('screenshots', file));
 
     console.log('Submitting form data:', Object.fromEntries(formData));
@@ -89,7 +94,7 @@ const AddChangeDialog: React.FC<AddChangeDialogProps> = ({ isOpen, onClose, onAd
     setCategory('');
     setService('');
     setChangeDate(new Date());
-    setUserName('Admin');
+    setUserId(null);
     setScreenshots([]);
     setError(null);
     onClose();
@@ -184,15 +189,15 @@ const AddChangeDialog: React.FC<AddChangeDialogProps> = ({ isOpen, onClose, onAd
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="user-name">User Name*</Label>
-            <Select value={userName} onValueChange={setUserName}>
-              <SelectTrigger id="user-name">
+            <Label htmlFor="user-id">User*</Label>
+            <Select value={userId?.toString()} onValueChange={(value) => setUserId(Number(value))}>
+              <SelectTrigger id="user-id">
                 <SelectValue placeholder="Select User" />
               </SelectTrigger>
               <SelectContent>
                 {users.map((user) => (
-                  <SelectItem key={user} value={user}>
-                    {user}
+                  <SelectItem key={user.id} value={user.id.toString()}>
+                    {user.username}
                   </SelectItem>
                 ))}
               </SelectContent>
