@@ -164,7 +164,7 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
               {screenshots.map((screenshot, index) => (
                 <div key={index} className="relative">
                   <img 
-                    src={`http://10.85.0.100${screenshot}`} 
+                    src={screenshot.startsWith('http') ? screenshot : `http://10.85.0.100${screenshot}`} 
                     alt={`Screenshot ${index + 1}`} 
                     className="w-20 h-20 object-cover" 
                   />
