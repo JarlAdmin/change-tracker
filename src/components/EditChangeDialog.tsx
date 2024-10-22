@@ -51,10 +51,8 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
 
   const checkImageExists = async (imagePath: string) => {
     try {
-      // Remove the leading '/uploads' from the path if it exists
-      const path = imagePath.startsWith('/uploads') ? imagePath.slice(8) : imagePath;
-      const response = await axios.get(`http://10.85.0.100:3001/api/check-file?path=${encodeURIComponent(path)}`);
-      return response.data.exists;
+      const response = await axios.get(imagePath, { responseType: 'blob' });
+      return response.status === 200;
     } catch (error) {
       console.error('Error checking file existence:', error);
       return false;
@@ -187,12 +185,11 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
             <Label htmlFor="screenshots">Existing Screenshots</Label>
             <div className="flex flex-wrap gap-2">
               {screenshots.map((screenshot, index) => {
-                const imageUrl = screenshot.startsWith('http') ? screenshot : `http://10.85.0.100${screenshot}`;
                 return (
                   <div key={index} className="relative">
                     {!imageErrors[index] ? (
                       <img 
-                        src={imageUrl}
+                        src={`http://10.85.0.100:3001${screenshot}`}
                         alt={`Screenshot ${index + 1}`} 
                         className="w-20 h-20 object-cover" 
                         onError={() => handleImageError(index, screenshot)}
