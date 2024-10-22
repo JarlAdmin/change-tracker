@@ -239,7 +239,7 @@ const App: React.FC = () => {
 
   const uniqueCategories = useMemo(() => {
     const categories = new Set(changes.map(change => change.category));
-    return ['', ...Array.from(categories)];
+    return Array.from(categories).filter(category => category !== '');
   }, [changes]);
 
   return (
@@ -258,7 +258,11 @@ const App: React.FC = () => {
             value={categoryFilter}
             onChange={(value) => {
               setCategoryFilter(value);
-              table.getColumn('category')?.setFilterValue(value);
+              if (value === 'all') {
+                table.getColumn('category')?.setFilterValue('');
+              } else {
+                table.getColumn('category')?.setFilterValue(value);
+              }
             }}
           />
         </div>

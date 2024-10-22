@@ -14,9 +14,10 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({ categories, value, onCh
         <SelectValue placeholder="Filter by category" />
       </SelectTrigger>
       <SelectContent>
-        {categories.map((category) => (
+        <SelectItem value="all">All Categories</SelectItem>
+        {categories.filter(category => category !== '').map((category) => (
           <SelectItem key={category} value={category}>
-            {category || 'All Categories'}
+            {category}
           </SelectItem>
         ))}
       </SelectContent>
