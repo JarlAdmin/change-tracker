@@ -44,14 +44,16 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (changeDetails.trim() && category.trim() && service.trim() && userName.trim()) {
-      onEditChange(change.id, {
+      const updatedChange = {
         change_details: changeDetails,
         category,
         service,
         username: userName,
         date: changeDate.toISOString(),
         screenshots: screenshots,
-      });
+      };
+      console.log('Submitting updated change:', updatedChange);
+      onEditChange(change.id, updatedChange);
       onClose();
     }
   };

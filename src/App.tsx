@@ -63,7 +63,9 @@ const App: React.FC = () => {
 
   const editChange = async (id: number, updatedChange: Omit<Change, 'id'>) => {
     try {
+      console.log('Sending edit request:', { id, ...updatedChange });
       const response = await axios.put(`http://10.85.0.100/api/changes/${id}`, updatedChange);
+      console.log('Received response:', response.data);
       setChanges(changes.map(change => change.id === id ? response.data : change));
       toast.success('Change updated successfully');
     } catch (error) {
