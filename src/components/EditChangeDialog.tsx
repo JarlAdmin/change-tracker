@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
@@ -32,6 +33,7 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
   const [userName, setUserName] = useState(change.username);
   const [screenshots, setScreenshots] = useState<string[]>(change.screenshots);
   const [newScreenshots, setNewScreenshots] = useState<File[]>([]);
+  const [imageErrors, setImageErrors] = useState<{[key: string]: boolean}>({});
 
   useEffect(() => {
     console.log('Change object:', change);
@@ -44,7 +46,25 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
     setUserName(change.username);
     setScreenshots(change.screenshots);
     setNewScreenshots([]);
+    setImageErrors({});
   }, [change]);
+
+  const checkImageExists = async (imagePath: string) => {
+    try {
+      const response = await axios.get(`http://10.85.0.100:3001/api/check-file?path=${encodeURIComponent(imagePath)}`);
+      return response.data.exists;
+    } catch (error) {
+      console.error('Error checking file existence:', error);
+      return false;
+    }
+  };
+
+  const handleImageError = async (index: number, imagePath: string) => {
+    const exists = await checkImageExists(imagePath);
+    if (!exists) {
+      setImageErrors(prev => ({ ...prev, [index]: true }));
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -166,19 +186,20 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
             <div className="flex flex-wrap gap-2">
               {screenshots.map((screenshot, index) => {
                 const imageUrl = screenshot.startsWith('http') ? screenshot : `http://10.85.0.100${screenshot}`;
-                console.log('Loading image:', imageUrl);
                 return (
                   <div key={index} className="relative">
-                    <img 
-                      src={imageUrl}
-                      alt={`Screenshot ${index + 1}`} 
-                      className="w-20 h-20 object-cover" 
-                      onError={(e) => {
-                        console.error('Image failed to load:', imageUrl);
-                        console.error('Error event:', e);
-                      }}
-                      onLoad={() => console.log('Image loaded successfully:', imageUrl)}
-                    />
+                    {!imageErrors[index] ? (
+                      <img 
+                        src={imageUrl}
+                        alt={`Screenshot ${index + 1}`} 
+                        className="w-20 h-20 object-cover" 
+                        onError={() => handleImageError(index, screenshot)}
+                      />
+                    ) : (
+                      <div className="w-20 h-20 bg-gray-200 flex items-center justify-center text-sm text-gray-500">
+                        Image not found
+                      </div>
+                    )}
                     <Button
                       type="button"
                       variant="destructive"
