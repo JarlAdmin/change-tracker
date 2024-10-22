@@ -17,12 +17,11 @@ import { AlertCircle, X } from "lucide-react";
 import { Change } from '../types/change';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import imageCompression from 'browser-image-compression'; // You'll need to install this package
 
 interface AddChangeDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onAddChange: (change: Omit<Change, 'id'>) => void;
+  onAddChange: (change: FormData) => void;
 }
 
 const AddChangeDialog: React.FC<AddChangeDialogProps> = ({ isOpen, onClose, onAddChange }) => {
@@ -31,55 +30,14 @@ const AddChangeDialog: React.FC<AddChangeDialogProps> = ({ isOpen, onClose, onAd
   const [service, setService] = useState('');
   const [changeDate, setChangeDate] = useState<Date>(new Date());
   const [userName, setUserName] = useState('');
-  const [screenshots, setScreenshots] = useState<string[]>([]);
+  const [screenshots, setScreenshots] = useState<File[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  const compressImage = async (imageFile: File): Promise<string> => {
-    const options = {
-      maxSizeMB: 1,
-      maxWidthOrHeight: 1920,
-      useWebWorker: true
-    };
-    
-    try {
-      const compressedFile = await imageCompression(imageFile, options);
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (e) => resolve(e.target?.result as string);
-        reader.onerror = (e) => reject(e);
-        reader.readAsDataURL(compressedFile);
-      });
-    } catch (error) {
-      console.error("Error compressing image:", error);
-      throw error;
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      setScreenshots(Array.from(event.target.files));
     }
   };
-
-  const handlePaste = useCallback(async (event: ClipboardEvent) => {
-    const items = event.clipboardData?.items;
-    if (items) {
-      for (let i = 0; i < items.length; i++) {
-        if (items[i].type.indexOf('image') !== -1) {
-          const blob = items[i].getAsFile();
-          if (blob) {
-            try {
-              const compressedImage = await compressImage(blob);
-              setScreenshots(prev => [...prev, compressedImage]);
-            } catch (error) {
-              console.error("Error processing pasted image:", error);
-            }
-          }
-        }
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    document.addEventListener('paste', handlePaste);
-    return () => {
-      document.removeEventListener('paste', handlePaste);
-    };
-  }, [handlePaste]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -91,14 +49,16 @@ const AddChangeDialog: React.FC<AddChangeDialogProps> = ({ isOpen, onClose, onAd
       setError("Please select a service for the chosen category.");
       return;
     }
-    onAddChange({
-      change_details: changeDetails,
-      category,
-      service: category === 'General Changes' ? 'General Change' : service,
-      date: changeDate.toISOString(),
-      username: userName,
-      screenshots: screenshots,
-    });
+
+    const formData = new FormData();
+    formData.append('change_details', changeDetails);
+    formData.append('category', category);
+    formData.append('service', category === 'General Changes' ? 'General Change' : service);
+    formData.append('date', changeDate.toISOString());
+    formData.append('username', userName);
+    screenshots.forEach(file => formData.append('screenshots', file));
+
+    onAddChange(formData);
     handleClose();
   };
 
@@ -207,11 +167,18 @@ const AddChangeDialog: React.FC<AddChangeDialogProps> = ({ isOpen, onClose, onAd
             />
           </div>
           <div className="space-y-2">
-            <Label>Screenshots</Label>
-            <div className="flex flex-wrap gap-2">
-              {screenshots.map((screenshot, index) => (
+            <Label htmlFor="screenshots">Screenshots</Label>
+            <Input
+              id="screenshots"
+              type="file"
+              onChange={handleFileChange}
+              multiple
+              accept="image/*"
+            />
+            <div className="flex flex-wrap gap-2 mt-2">
+              {screenshots.map((file, index) => (
                 <div key={index} className="relative">
-                  <img src={screenshot} alt={`Screenshot ${index + 1}`} className="w-20 h-20 object-cover" />
+                  <img src={URL.createObjectURL(file)} alt={`Screenshot ${index + 1}`} className="w-20 h-20 object-cover" />
                   <Button
                     type="button"
                     variant="destructive"
@@ -224,7 +191,6 @@ const AddChangeDialog: React.FC<AddChangeDialogProps> = ({ isOpen, onClose, onAd
                 </div>
               ))}
             </div>
-            <p className="text-sm text-muted-foreground">Paste screenshots here</p>
           </div>
           <DialogFooter>
             <Button type="submit">Add Change</Button>

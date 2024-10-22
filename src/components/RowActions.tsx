@@ -13,11 +13,16 @@ import EditChangeDialog from './EditChangeDialog';
 interface RowActionsProps {
   change: Change;
   onDelete: (id: number) => void;
-  onEdit: (id: number, updatedChange: Omit<Change, 'id'>) => void;
+  onEdit: (id: number, updatedChange: FormData) => void;
 }
 
 const RowActions: React.FC<RowActionsProps> = ({ change, onDelete, onEdit }) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+  const handleEdit = (id: number, updatedChange: FormData) => {
+    onEdit(id, updatedChange);
+    setIsEditDialogOpen(false);
+  };
 
   return (
     <>
@@ -43,7 +48,7 @@ const RowActions: React.FC<RowActionsProps> = ({ change, onDelete, onEdit }) => 
       <EditChangeDialog
         isOpen={isEditDialogOpen}
         onClose={() => setIsEditDialogOpen(false)}
-        onEditChange={onEdit}
+        onEditChange={handleEdit}
         change={change}
       />
     </>

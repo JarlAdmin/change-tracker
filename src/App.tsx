@@ -37,11 +37,12 @@ const App: React.FC = () => {
     }
   };
 
-  const addChange = async (changeData: Omit<Change, 'id' | 'date'>) => {
+  const addChange = async (changeData: FormData) => {
     try {
-      const response = await axios.post('http://10.85.0.100/api/changes', {
-        ...changeData,
-        date: new Date().toISOString() // Add the current date
+      const response = await axios.post('http://10.85.0.100/api/changes', changeData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
       });
       setChanges([response.data, ...changes]);
     } catch (error) {
@@ -61,10 +62,14 @@ const App: React.FC = () => {
     }
   };
 
-  const editChange = async (id: number, updatedChange: Omit<Change, 'id'>) => {
+  const editChange = async (id: number, updatedChange: FormData) => {
     try {
-      console.log('Sending edit request:', { id, ...updatedChange });
-      const response = await axios.put(`http://10.85.0.100/api/changes/${id}`, updatedChange);
+      console.log('Sending edit request:', { id, ...Object.fromEntries(updatedChange) });
+      const response = await axios.put(`http://10.85.0.100/api/changes/${id}`, updatedChange, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
       console.log('Received response:', response.data);
       setChanges(changes.map(change => change.id === id ? response.data : change));
       toast.success('Change updated successfully');

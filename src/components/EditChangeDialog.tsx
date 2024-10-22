@@ -20,7 +20,7 @@ import { X } from "lucide-react";
 interface EditChangeDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onEditChange: (id: number, updatedChange: Omit<Change, 'id'>) => void;
+  onEditChange: (id: number, updatedChange: FormData) => void;
   change: Change;
 }
 
@@ -30,7 +30,8 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
   const [service, setService] = useState(change.service);
   const [changeDate, setChangeDate] = useState<Date>(new Date(change.date));
   const [userName, setUserName] = useState(change.username);
-  const [screenshots, setScreenshots] = useState<string[]>(change.screenshots || []);
+  const [screenshots, setScreenshots] = useState<string[]>(change.screenshots);
+  const [newScreenshots, setNewScreenshots] = useState<File[]>([]);
 
   useEffect(() => {
     setChangeDetails(change.change_details);
@@ -38,28 +39,35 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
     setService(change.service);
     setChangeDate(new Date(change.date));
     setUserName(change.username);
-    setScreenshots(change.screenshots || []);
+    setScreenshots(change.screenshots);
+    setNewScreenshots([]);
   }, [change]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (changeDetails.trim() && category.trim() && service.trim() && userName.trim()) {
-      const updatedChange = {
-        change_details: changeDetails,
-        category,
-        service,
-        username: userName,
-        date: changeDate.toISOString(),
-        screenshots: screenshots,
-      };
-      console.log('Submitting updated change:', updatedChange);
-      onEditChange(change.id, updatedChange);
+      const formData = new FormData();
+      formData.append('change_details', changeDetails);
+      formData.append('category', category);
+      formData.append('service', service);
+      formData.append('username', userName);
+      formData.append('date', changeDate.toISOString());
+      formData.append('existing_screenshots', JSON.stringify(screenshots));
+      newScreenshots.forEach(file => formData.append('screenshots', file));
+
+      onEditChange(change.id, formData);
       onClose();
     }
   };
 
   const removeScreenshot = (index: number) => {
     setScreenshots(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      setNewScreenshots(Array.from(event.target.files));
+    }
   };
 
   return (
@@ -151,7 +159,7 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
             />
           </div>
           <div className="space-y-2">
-            <Label>Screenshots</Label>
+            <Label htmlFor="screenshots">Existing Screenshots</Label>
             <div className="flex flex-wrap gap-2">
               {screenshots.map((screenshot, index) => (
                 <div key={index} className="relative">
@@ -162,6 +170,32 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
                     size="icon"
                     className="absolute top-0 right-0 h-6 w-6"
                     onClick={() => removeScreenshot(index)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="new-screenshots">Add New Screenshots</Label>
+            <Input
+              id="new-screenshots"
+              type="file"
+              onChange={handleFileChange}
+              multiple
+              accept="image/*"
+            />
+            <div className="flex flex-wrap gap-2 mt-2">
+              {newScreenshots.map((file, index) => (
+                <div key={index} className="relative">
+                  <img src={URL.createObjectURL(file)} alt={`New Screenshot ${index + 1}`} className="w-20 h-20 object-cover" />
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="icon"
+                    className="absolute top-0 right-0 h-6 w-6"
+                    onClick={() => setNewScreenshots(prev => prev.filter((_, i) => i !== index))}
                   >
                     <X className="h-4 w-4" />
                   </Button>
