@@ -28,6 +28,8 @@ import { Checkbox } from "./components/ui/checkbox";
 import CategoryFilter from './components/CategoryFilter';
 import ServiceFilter from './components/ServiceFilter';
 import { toast } from 'react-hot-toast';
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from './components/AppSidebar';
 
 const API_BASE_URL = 'http://10.85.0.100:3001';
 
@@ -257,107 +259,113 @@ const App: React.FC = () => {
   }, [changes]);
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Change Tracker</h1>
-      <div className="mb-4 flex justify-between items-center">
-        <div className="flex items-center space-x-2">
-          <Input
-            placeholder="Search all columns..."
-            value={globalFilter}
-            onChange={(event) => setGlobalFilter(event.target.value)}
-            className="max-w-sm"
+    <SidebarProvider>
+      <div className="flex h-screen">
+        <AppSidebar />
+        <main className="flex-1 overflow-y-auto p-4">
+          <SidebarTrigger />
+          <h1 className="text-2xl font-bold mb-4">Change Tracker</h1>
+          <div className="mb-4 flex justify-between items-center">
+            <div className="flex items-center space-x-2">
+              <Input
+                placeholder="Search all columns..."
+                value={globalFilter}
+                onChange={(event) => setGlobalFilter(event.target.value)}
+                className="max-w-sm"
+              />
+              <CategoryFilter
+                categories={uniqueCategories}
+                value={categoryFilter}
+                onChange={setCategoryFilter}
+              />
+              <ServiceFilter
+                services={uniqueServices}
+                value={serviceFilter}
+                onChange={setServiceFilter}
+              />
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={resetFilters}
+                title="Reset filters"
+              >
+                <RotateCcw className="h-4 w-4" />
+              </Button>
+            </div>
+            <Button onClick={() => setIsAddDialogOpen(true)}>Add Change</Button>
+          </div>
+          <AddChangeDialog
+            isOpen={isAddDialogOpen}
+            onClose={() => setIsAddDialogOpen(false)}
+            onAddChange={addChange}
           />
-          <CategoryFilter
-            categories={uniqueCategories}
-            value={categoryFilter}
-            onChange={setCategoryFilter}
-          />
-          <ServiceFilter
-            services={uniqueServices}
-            value={serviceFilter}
-            onChange={setServiceFilter}
-          />
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={resetFilters}
-            title="Reset filters"
-          >
-            <RotateCcw className="h-4 w-4" />
-          </Button>
-        </div>
-        <Button onClick={() => setIsAddDialogOpen(true)}>Add Change</Button>
-      </div>
-      <AddChangeDialog
-        isOpen={isAddDialogOpen}
-        onClose={() => setIsAddDialogOpen(false)}
-        onAddChange={addChange}
-      />
-      <div className="flex-1 text-sm text-muted-foreground mb-2">
-        {table.getFilteredSelectedRowModel().rows.length} of{" "}
-        {table.getFilteredRowModel().rows.length} row(s) selected.
-      </div>
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
+          <div className="flex-1 text-sm text-muted-foreground mb-2">
+            {table.getFilteredSelectedRowModel().rows.length} of{" "}
+            {table.getFilteredRowModel().rows.length} row(s) selected.
+          </div>
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
+                    ))}
+                  </TableRow>
                 ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() && "selected"}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={columns.length} className="h-24 text-center">
+                      No results.
                     </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+          <div className="flex items-center justify-end space-x-2 py-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+            >
+              Next
+            </Button>
+          </div>
+        </main>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          Previous
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Next
-        </Button>
-      </div>
-    </div>
+    </SidebarProvider>
   );
 };
 
