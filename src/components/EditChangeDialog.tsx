@@ -191,7 +191,10 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
                       src={`http://10.85.0.100:3001${screenshot}`}
                       alt={`Screenshot ${index + 1}`} 
                       className="w-20 h-20 object-cover" 
-                      onError={() => handleImageError(index, screenshot)}
+                      onError={(e) => {
+                        console.error('Image failed to load:', e.currentTarget.src);
+                        handleImageError(index, screenshot);
+                      }}
                     />
                   </div>
                 );
