@@ -27,6 +27,7 @@ import { ArrowUpDown } from "lucide-react";
 import { Input } from "./components/ui/input";
 import { Checkbox } from "./components/ui/checkbox";
 import CategoryFilter from './components/CategoryFilter';
+import ServiceFilter from './components/ServiceFilter';
 import { toast } from 'react-hot-toast';
 
 const API_BASE_URL = 'http://10.85.0.100:3001';
@@ -38,6 +39,7 @@ const App: React.FC = () => {
   const [globalFilter, setGlobalFilter] = useState('');
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [categoryFilter, setCategoryFilter] = useState<string>('');
+  const [serviceFilter, setServiceFilter] = useState<string>('');
 
   useEffect(() => {
     fetchChanges();
@@ -228,10 +230,18 @@ const App: React.FC = () => {
       sorting,
       globalFilter,
       rowSelection,
+      columnFilters: [
+        { id: 'category', value: categoryFilter },
+        { id: 'service', value: serviceFilter },
+      ],
     },
     filterFns: {
       categoryFilter: (row, columnId, filterValue: string) => {
-        if (filterValue === '') return true;
+        if (filterValue === '' || filterValue === 'all') return true;
+        return row.getValue(columnId) === filterValue;
+      },
+      serviceFilter: (row, columnId, filterValue: string) => {
+        if (filterValue === '' || filterValue === 'all') return true;
         return row.getValue(columnId) === filterValue;
       },
     },
@@ -240,6 +250,11 @@ const App: React.FC = () => {
   const uniqueCategories = useMemo(() => {
     const categories = new Set(changes.map(change => change.category));
     return Array.from(categories).filter(category => category !== '');
+  }, [changes]);
+
+  const uniqueServices = useMemo(() => {
+    const services = new Set(changes.map(change => change.service));
+    return Array.from(services).filter(service => service !== '');
   }, [changes]);
 
   return (
@@ -258,11 +273,15 @@ const App: React.FC = () => {
             value={categoryFilter}
             onChange={(value) => {
               setCategoryFilter(value);
-              if (value === 'all') {
-                table.getColumn('category')?.setFilterValue('');
-              } else {
-                table.getColumn('category')?.setFilterValue(value);
-              }
+              table.getColumn('category')?.setFilterValue(value);
+            }}
+          />
+          <ServiceFilter
+            services={uniqueServices}
+            value={serviceFilter}
+            onChange={(value) => {
+              setServiceFilter(value);
+              table.getColumn('service')?.setFilterValue(value);
             }}
           />
         </div>
