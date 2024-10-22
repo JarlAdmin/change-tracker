@@ -236,13 +236,15 @@ const App: React.FC = () => {
       ],
     },
     filterFns: {
-      categoryFilter: (row, columnId, filterValue: string) => {
+      categoryFilter: (row, columnId, filterValue) => {
         if (filterValue === '' || filterValue === 'all') return true;
-        return row.getValue(columnId) === filterValue;
+        const cellValue = row.getValue(columnId) as string;
+        return cellValue === filterValue;
       },
-      serviceFilter: (row, columnId, filterValue: string) => {
+      serviceFilter: (row, columnId, filterValue) => {
         if (filterValue === '' || filterValue === 'all') return true;
-        return row.getValue(columnId) === filterValue;
+        const cellValue = row.getValue(columnId) as string;
+        return cellValue === filterValue;
       },
     },
   });
@@ -273,7 +275,7 @@ const App: React.FC = () => {
             value={categoryFilter}
             onChange={(value) => {
               setCategoryFilter(value);
-              table.getColumn('category')?.setFilterValue(value);
+              table.getColumn('category')?.setFilterValue(value === 'all' ? '' : value);
             }}
           />
           <ServiceFilter
@@ -281,7 +283,7 @@ const App: React.FC = () => {
             value={serviceFilter}
             onChange={(value) => {
               setServiceFilter(value);
-              table.getColumn('service')?.setFilterValue(value);
+              table.getColumn('service')?.setFilterValue(value === 'all' ? '' : value);
             }}
           />
         </div>
