@@ -10,6 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { Separator } from "@/components/ui/separator";
 
 const items = [
   {
@@ -45,13 +46,14 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Change Tracker</SidebarGroupLabel>
+          <Separator className="my-2" />
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <a href={item.url}>
-                      <item.icon />
+                      <item.icon className="mr-2 h-4 w-4" />
                       <span>{item.title}</span>
                     </a>
                   </SidebarMenuButton>
