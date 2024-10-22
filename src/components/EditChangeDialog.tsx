@@ -198,7 +198,7 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
                       className="w-20 h-20 object-cover" 
                       onError={(e) => {
                         console.error('Image failed to load:', e.currentTarget.src);
-                        setImageErrors(prev => ({ ...prev, [index]: true }));
+                        handleImageError(index, screenshot.filepath);
                       }}
                     />
                   ) : (
@@ -206,17 +206,15 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
                       Image not found
                     </div>
                   )}
-                  {!imageErrors[index] && (
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="icon"
-                      className="absolute top-0 right-0 h-6 w-6"
-                      onClick={() => removeScreenshot(index)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  )}
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="icon"
+                    className="absolute top-0 right-0 h-6 w-6"
+                    onClick={() => removeScreenshot(index)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
                 </div>
               ))}
             </div>
