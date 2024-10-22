@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
@@ -38,7 +38,7 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
   const [screenshots, setScreenshots] = useState<Screenshot[]>(change.screenshots.filter(screenshot => screenshot.id !== null && screenshot.filepath !== null) || []);
   const [newScreenshots, setNewScreenshots] = useState<File[]>([]);
 
-  useEffect(() => {
+  const initializeState = useCallback(() => {
     console.log('Change object:', change);
     console.log('Screenshots:', change.screenshots);
     
@@ -50,6 +50,12 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
     setScreenshots(change.screenshots.filter(screenshot => screenshot.id !== null && screenshot.filepath !== null) || []);
     setNewScreenshots([]);
   }, [change]);
+
+  useEffect(() => {
+    if (isOpen) {
+      initializeState();
+    }
+  }, [isOpen, initializeState]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -231,4 +237,4 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
   );
 };
 
-export default EditChangeDialog;
+export default React.memo(EditChangeDialog);

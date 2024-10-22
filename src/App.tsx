@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import axios from 'axios';
 import {
   Table,
@@ -82,7 +82,7 @@ const App: React.FC = () => {
     }
   };
 
-  const editChange = async (id: number, updatedChange: FormData) => {
+  const editChange = useCallback(async (id: number, updatedChange: FormData) => {
     try {
       console.log('Sending edit request:', { id, ...Object.fromEntries(updatedChange) });
       const response = await axios.put(`${API_BASE_URL}/api/changes/${id}`, updatedChange, {
@@ -91,7 +91,7 @@ const App: React.FC = () => {
         }
       });
       console.log('Received response:', response.data);
-      setChanges(changes.map(change => change.id === id ? response.data : change));
+      setChanges(prevChanges => prevChanges.map(change => change.id === id ? response.data : change));
       toast.success('Change updated successfully');
     } catch (error) {
       console.error('Error editing change:', error);
@@ -102,7 +102,7 @@ const App: React.FC = () => {
         toast.error('An unexpected error occurred while updating the change');
       }
     }
-  };
+  }, [API_BASE_URL]);
 
   const columns: ColumnDef<Change>[] = [
     {

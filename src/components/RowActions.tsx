@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { MoreHorizontal } from "lucide-react";
 import { Button } from "./ui/button";
 import {
@@ -21,10 +21,10 @@ const RowActions: React.FC<RowActionsProps> = ({ change, onDelete, onEdit }) => 
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
 
-  const handleEdit = (id: number, updatedChange: FormData) => {
+  const handleEdit = useCallback((id: number, updatedChange: FormData) => {
     onEdit(id, updatedChange);
     setIsEditDialogOpen(false);
-  };
+  }, [onEdit]);
 
   return (
     <>
@@ -50,19 +50,23 @@ const RowActions: React.FC<RowActionsProps> = ({ change, onDelete, onEdit }) => 
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <EditChangeDialog
-        isOpen={isEditDialogOpen}
-        onClose={() => setIsEditDialogOpen(false)}
-        onEditChange={handleEdit}
-        change={change}
-      />
-      <ViewChangeDialog
-        isOpen={isViewDialogOpen}
-        onClose={() => setIsViewDialogOpen(false)}
-        change={change}
-      />
+      {isEditDialogOpen && (
+        <EditChangeDialog
+          isOpen={isEditDialogOpen}
+          onClose={() => setIsEditDialogOpen(false)}
+          onEditChange={handleEdit}
+          change={change}
+        />
+      )}
+      {isViewDialogOpen && (
+        <ViewChangeDialog
+          isOpen={isViewDialogOpen}
+          onClose={() => setIsViewDialogOpen(false)}
+          change={change}
+        />
+      )}
     </>
   );
 };
 
-export default RowActions;
+export default React.memo(RowActions);
