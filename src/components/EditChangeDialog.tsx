@@ -163,7 +163,11 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
             <div className="flex flex-wrap gap-2">
               {screenshots.map((screenshot, index) => (
                 <div key={index} className="relative">
-                  <img src={screenshot} alt={`Screenshot ${index + 1}`} className="w-20 h-20 object-cover" />
+                  <img 
+                    src={`http://10.85.0.100${screenshot}`} 
+                    alt={`Screenshot ${index + 1}`} 
+                    className="w-20 h-20 object-cover" 
+                  />
                   <Button
                     type="button"
                     variant="destructive"
