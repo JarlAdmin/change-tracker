@@ -15,6 +15,8 @@ const ViewChangeDialog: React.FC<ViewChangeDialogProps> = ({ isOpen, onClose, ch
 
   if (!change) return null;
 
+  const validScreenshots = change.screenshots.filter(screenshot => screenshot.id !== null && screenshot.filepath !== null);
+
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
@@ -62,11 +64,11 @@ const ViewChangeDialog: React.FC<ViewChangeDialogProps> = ({ isOpen, onClose, ch
                   <p className="text-sm">{change.username}</p>
                 </div>
               </div>
-              {change.screenshots && change.screenshots.length > 0 && (
+              {validScreenshots.length > 0 && (
                 <div className="space-y-1">
                   <Label>Screenshots</Label>
                   <div className="grid grid-cols-2 gap-2">
-                    {change.screenshots.map((screenshot, index) => (
+                    {validScreenshots.map((screenshot, index) => (
                       <img 
                         key={index} 
                         src={`http://10.85.0.100:3001${screenshot.filepath}`}
