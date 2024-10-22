@@ -191,15 +191,21 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
             <div className="flex flex-wrap gap-2">
               {screenshots.map((screenshot, index) => (
                 <div key={index} className="relative">
-                  <img 
-                    src={`http://10.85.0.100:3001${screenshot.filepath}`}
-                    alt={`Screenshot ${index + 1}`} 
-                    className="w-20 h-20 object-cover" 
-                    onError={(e) => {
-                      console.error('Image failed to load:', e.currentTarget.src);
-                      setImageErrors(prev => ({ ...prev, [index]: true }));
-                    }}
-                  />
+                  {screenshot && screenshot.filepath ? (
+                    <img 
+                      src={`http://10.85.0.100:3001${screenshot.filepath}`}
+                      alt={`Screenshot ${index + 1}`} 
+                      className="w-20 h-20 object-cover" 
+                      onError={(e) => {
+                        console.error('Image failed to load:', e.currentTarget.src);
+                        setImageErrors(prev => ({ ...prev, [index]: true }));
+                      }}
+                    />
+                  ) : (
+                    <div className="w-20 h-20 bg-gray-200 flex items-center justify-center text-sm text-gray-500">
+                      Image not found
+                    </div>
+                  )}
                   {!imageErrors[index] && (
                     <Button
                       type="button"
