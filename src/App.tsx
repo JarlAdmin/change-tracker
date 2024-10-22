@@ -18,6 +18,7 @@ import AddChangeDialog from './components/AddChangeDialog';
 import RowActions from './components/RowActions';
 import { Change } from './types/change';
 import { Button } from "./components/ui/button";
+import { toast } from 'react-hot-toast'; // Make sure to install this package if you haven't already
 
 const App: React.FC = () => {
   const [changes, setChanges] = useState<Change[]>([]);
@@ -45,6 +46,9 @@ const App: React.FC = () => {
       setChanges([response.data, ...changes]);
     } catch (error) {
       console.error('Error adding change:', error);
+      if (axios.isAxiosError(error) && error.response) {
+        console.error('Server response:', error.response.data);
+      }
     }
   };
 
@@ -61,8 +65,15 @@ const App: React.FC = () => {
     try {
       const response = await axios.put(`http://10.85.0.100/api/changes/${id}`, updatedChange);
       setChanges(changes.map(change => change.id === id ? response.data : change));
+      toast.success('Change updated successfully');
     } catch (error) {
       console.error('Error editing change:', error);
+      if (axios.isAxiosError(error) && error.response) {
+        console.error('Server response:', error.response.data);
+        toast.error(`Error updating change: ${error.response.data.error}`);
+      } else {
+        toast.error('An unexpected error occurred while updating the change');
+      }
     }
   };
 
