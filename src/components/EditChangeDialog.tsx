@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import axios from 'axios';
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
@@ -34,9 +35,23 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
   const [category, setCategory] = useState(change.category);
   const [service, setService] = useState(change.service);
   const [changeDate, setChangeDate] = useState<Date>(new Date(change.date));
-  const [userName, setUserName] = useState(change.username);
+  const [userId, setUserId] = useState<number>(change.user_id);
   const [screenshots, setScreenshots] = useState<Screenshot[]>(change.screenshots.filter(screenshot => screenshot.id !== null && screenshot.filepath !== null) || []);
   const [newScreenshots, setNewScreenshots] = useState<File[]>([]);
+  const [users, setUsers] = useState<Array<{ id: number, username: string }>>([]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await axios.get('http://10.85.0.100:3001/api/users');
+      setUsers(response.data);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  };
 
   const initializeState = useCallback(() => {
     console.log('Change object:', change);
@@ -46,7 +61,7 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
     setCategory(change.category);
     setService(change.service);
     setChangeDate(new Date(change.date));
-    setUserName(change.username);
+    setUserId(change.user_id);
     setScreenshots(change.screenshots.filter(screenshot => screenshot.id !== null && screenshot.filepath !== null) || []);
     setNewScreenshots([]);
   }, [change]);
@@ -59,12 +74,12 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (changeDetails.trim() && category.trim() && service.trim() && userName.trim()) {
+    if (changeDetails.trim() && category.trim() && service.trim() && userId) {
       const formData = new FormData();
       formData.append('change_details', changeDetails);
       formData.append('category', category);
       formData.append('service', service);
-      formData.append('username', userName);
+      formData.append('user_id', userId.toString());
       formData.append('date', changeDate.toISOString());
       formData.append('existing_screenshots', JSON.stringify(screenshots));
       newScreenshots.forEach(file => formData.append('screenshots', file));
@@ -173,12 +188,19 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="user-name">User Name</Label>
-            <Input
-              id="user-name"
-              value={userName}
-              onChange={(e) => setUserName(e.target.value)}
-            />
+            <Label htmlFor="user-id">User</Label>
+            <Select value={userId.toString()} onValueChange={(value) => setUserId(Number(value))}>
+              <SelectTrigger id="user-id">
+                <SelectValue placeholder="Select User" />
+              </SelectTrigger>
+              <SelectContent>
+                {users.map((user) => (
+                  <SelectItem key={user.id} value={user.id.toString()}>
+                    {user.username}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           {screenshots.length > 0 && (
             <div className="space-y-2">

@@ -1,8 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { Label } from './ui/label'
 import { Change } from '../types/change'
+import axios from 'axios';
 
 interface ViewChangeDialogProps {
   isOpen: boolean;
@@ -12,6 +13,23 @@ interface ViewChangeDialogProps {
 
 const ViewChangeDialog: React.FC<ViewChangeDialogProps> = ({ isOpen, onClose, change }) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [username, setUsername] = useState<string>('');
+
+  useEffect(() => {
+    if (change) {
+      fetchUsername(change.user_id);
+    }
+  }, [change]);
+
+  const fetchUsername = async (userId: number) => {
+    try {
+      const response = await axios.get(`http://10.85.0.100:3001/api/users/${userId}`);
+      setUsername(response.data.username);
+    } catch (error) {
+      console.error('Error fetching username:', error);
+      setUsername('Unknown');
+    }
+  };
 
   if (!change) return null;
 
@@ -61,7 +79,7 @@ const ViewChangeDialog: React.FC<ViewChangeDialogProps> = ({ isOpen, onClose, ch
                 </div>
                 <div className="space-y-1">
                   <Label>User Name</Label>
-                  <p className="text-sm">{change.username}</p>
+                  <p className="text-sm">{username}</p>
                 </div>
               </div>
               {validScreenshots.length > 0 && (

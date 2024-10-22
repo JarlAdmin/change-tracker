@@ -4,6 +4,6 @@ export interface Change {
   date: string;
   category: string;
   service: string;
-  username: string;
+  user_id: number;
   screenshots: Array<{ id: number, filepath: string }>;
 }

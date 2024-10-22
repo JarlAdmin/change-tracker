@@ -41,12 +41,12 @@ const App: React.FC = () => {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [serviceFilter, setServiceFilter] = useState<string>('all');
-  const [users, setUsers] = useState<string[]>(['Admin']);
+  const [users, setUsers] = useState<Array<{ id: number; username: string }>>([]);
 
   const fetchUsers = async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/api/users`);
-      setUsers(['Admin', ...response.data.map((user: any) => user.username)]);
+      setUsers(response.data);
     } catch (error) {
       console.error('Error fetching users:', error);
     }
@@ -198,7 +198,7 @@ const App: React.FC = () => {
       },
     },
     {
-      accessorKey: "username",
+      accessorKey: "user_id",
       header: ({ column }) => {
         return (
           <Button
@@ -209,6 +209,11 @@ const App: React.FC = () => {
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         )
+      },
+      cell: ({ row }) => {
+        const userId = row.getValue("user_id") as number;
+        const user = users.find(u => u.id === userId);
+        return user ? user.username : 'Unknown';
       },
     },
     {
@@ -236,14 +241,15 @@ const App: React.FC = () => {
     return changes.filter(change => {
       const matchesCategory = categoryFilter === 'all' || change.category === categoryFilter;
       const matchesService = serviceFilter === 'all' || change.service === serviceFilter;
+      const user = users.find(u => u.id === change.user_id);
       const matchesGlobalFilter = 
         change.change_details.toLowerCase().includes(globalFilter.toLowerCase()) ||
         change.category.toLowerCase().includes(globalFilter.toLowerCase()) ||
         change.service.toLowerCase().includes(globalFilter.toLowerCase()) ||
-        change.username.toLowerCase().includes(globalFilter.toLowerCase());
+        (user ? user.username.toLowerCase().includes(globalFilter.toLowerCase()) : false);
       return matchesCategory && matchesService && matchesGlobalFilter;
     });
-  }, [changes, categoryFilter, serviceFilter, globalFilter]);
+  }, [changes, categoryFilter, serviceFilter, globalFilter, users]);
 
   const table = useReactTable({
     data: filteredChanges,
