@@ -209,13 +209,15 @@ const App: React.FC = () => {
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Change Tracker</h1>
       <div className="mb-4 flex justify-between items-center">
+        <div className="w-1/3">
+          <Input
+            placeholder="Search all columns..."
+            value={globalFilter ?? ""}
+            onChange={(event) => setGlobalFilter(event.target.value)}
+            className="max-w-sm"
+          />
+        </div>
         <Button onClick={() => setIsAddDialogOpen(true)}>Add Change</Button>
-        <Input
-          placeholder="Search all columns..."
-          value={globalFilter ?? ""}
-          onChange={(event) => setGlobalFilter(event.target.value)}
-          className="max-w-sm"
-        />
       </div>
       <AddChangeDialog
         isOpen={isAddDialogOpen}
