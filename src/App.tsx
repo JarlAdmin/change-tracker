@@ -33,7 +33,7 @@ const App: React.FC = () => {
   const fetchChanges = async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/api/changes`);
-      console.log('Fetched changes:', response.data); // Add this line for debugging
+      console.log('Full API response:', response);
       setChanges(response.data);
     } catch (error) {
       console.error('Error fetching changes:', error);
