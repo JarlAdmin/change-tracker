@@ -69,7 +69,11 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
   };
 
   const removeScreenshot = (index: number) => {
-    setScreenshots(prev => prev.filter((_, i) => i !== index));
+    setScreenshots(prev => {
+      const updatedScreenshots = prev.filter((_, i) => i !== index);
+      // If all screenshots are removed, return an empty array
+      return updatedScreenshots.length > 0 ? updatedScreenshots : [];
+    });
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {

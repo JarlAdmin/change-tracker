@@ -85,6 +85,9 @@ const ViewChangeDialog: React.FC<ViewChangeDialogProps> = ({ isOpen, onClose, ch
       {selectedImage && (
         <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
           <DialogContent className="max-w-3xl">
+            <DialogHeader>
+              <DialogTitle>Screenshot Preview</DialogTitle>
+            </DialogHeader>
             <img src={selectedImage} alt="Selected screenshot" className="w-full h-auto" />
           </DialogContent>
         </Dialog>
