@@ -34,7 +34,13 @@ const AddChangeDialog: React.FC<AddChangeDialogProps> = ({ isOpen, onClose, onAd
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
-      setScreenshots(Array.from(event.target.files));
+      const files = Array.from(event.target.files);
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'];
+      const validFiles = files.filter(file => allowedTypes.includes(file.type));
+      if (validFiles.length !== files.length) {
+        setError("Some files were not added. Only JPEG, PNG, GIF, and SVG are allowed.");
+      }
+      setScreenshots(validFiles);
     }
   };
 
@@ -56,6 +62,8 @@ const AddChangeDialog: React.FC<AddChangeDialogProps> = ({ isOpen, onClose, onAd
     formData.append('date', changeDate.toISOString());
     formData.append('username', userName);
     screenshots.forEach(file => formData.append('screenshots', file));
+
+    console.log('Submitting form data:', Object.fromEntries(formData));
 
     onAddChange(formData);
     handleClose();

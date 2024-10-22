@@ -53,6 +53,8 @@ const App: React.FC = () => {
       if (axios.isAxiosError(error) && error.response) {
         console.error('Server response:', error.response.data);
       }
+      // Log the entire error object
+      console.error('Full error object:', JSON.stringify(error, null, 2));
     }
   };
 

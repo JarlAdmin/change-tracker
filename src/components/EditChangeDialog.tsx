@@ -187,27 +187,12 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
               {screenshots.map((screenshot, index) => {
                 return (
                   <div key={index} className="relative">
-                    {!imageErrors[index] ? (
-                      <img 
-                        src={`http://10.85.0.100:3001${screenshot}`}
-                        alt={`Screenshot ${index + 1}`} 
-                        className="w-20 h-20 object-cover" 
-                        onError={() => handleImageError(index, screenshot)}
-                      />
-                    ) : (
-                      <div className="w-20 h-20 bg-gray-200 flex items-center justify-center text-sm text-gray-500">
-                        Image not found
-                      </div>
-                    )}
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="icon"
-                      className="absolute top-0 right-0 h-6 w-6"
-                      onClick={() => removeScreenshot(index)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
+                    <img 
+                      src={`http://10.85.0.100:3001${screenshot}`}
+                      alt={`Screenshot ${index + 1}`} 
+                      className="w-20 h-20 object-cover" 
+                      onError={() => handleImageError(index, screenshot)}
+                    />
                   </div>
                 );
               })}
