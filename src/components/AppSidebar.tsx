@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Home, Calendar, Settings, PlusCircle, List, UserPlus } from "lucide-react";
+import { Home, Calendar, Settings, PlusCircle, List, UserPlus, Users } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import AddUserDialog from './AddUserDialog';
+import UserManagement from './UserManagement';
 
 const items = [
   {
@@ -35,6 +36,10 @@ const items = [
     icon: Calendar,
   },
   {
+    title: "User Management",
+    icon: Users,
+  },
+  {
     title: "Settings",
     url: "#",
     icon: Settings,
@@ -47,6 +52,7 @@ interface AppSidebarProps {
 
 export function AppSidebar({ onUserAdded }: AppSidebarProps) {
   const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
+  const [isUserManagementOpen, setIsUserManagementOpen] = useState(false);
 
   const handleUserAdded = async () => {
     await onUserAdded();
@@ -63,12 +69,19 @@ export function AppSidebar({ onUserAdded }: AppSidebarProps) {
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url}>
+                  {item.title === "User Management" ? (
+                    <SidebarMenuButton onClick={() => setIsUserManagementOpen(true)}>
                       <item.icon className="mr-2 h-4 w-4" />
                       <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
+                    </SidebarMenuButton>
+                  ) : (
+                    <SidebarMenuButton asChild>
+                      <a href={item.url}>
+                        <item.icon className="mr-2 h-4 w-4" />
+                        <span>{item.title}</span>
+                      </a>
+                    </SidebarMenuButton>
+                  )}
                 </SidebarMenuItem>
               ))}
               <SidebarMenuItem>
@@ -85,6 +98,10 @@ export function AppSidebar({ onUserAdded }: AppSidebarProps) {
         isOpen={isAddUserDialogOpen}
         onClose={() => setIsAddUserDialogOpen(false)}
         onUserAdded={handleUserAdded}
+      />
+      <UserManagement
+        isOpen={isUserManagementOpen}
+        onClose={() => setIsUserManagementOpen(false)}
       />
     </Sidebar>
   );
