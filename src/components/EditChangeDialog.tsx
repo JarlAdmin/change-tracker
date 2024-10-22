@@ -38,7 +38,6 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
   const [userName, setUserName] = useState(change.username);
   const [screenshots, setScreenshots] = useState<Screenshot[]>(change.screenshots || []);
   const [newScreenshots, setNewScreenshots] = useState<File[]>([]);
-  const [imageErrors, setImageErrors] = useState<{[key: string]: boolean}>({});
 
   useEffect(() => {
     console.log('Change object:', change);
@@ -51,22 +50,7 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
     setUserName(change.username);
     setScreenshots(change.screenshots || []);
     setNewScreenshots([]);
-    setImageErrors({});
   }, [change]);
-
-  const checkImageExists = async (imagePath: string) => {
-    try {
-      const response = await axios.get(imagePath, { responseType: 'blob' });
-      return response.status === 200;
-    } catch (error) {
-      console.error('Error checking file existence:', error);
-      return false;
-    }
-  };
-
-  const handleImageError = (index: number) => {
-    setImageErrors(prev => ({ ...prev, [index]: true }));
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -188,18 +172,12 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
             <div className="flex flex-wrap gap-2">
               {screenshots.map((screenshot, index) => (
                 <div key={index} className="relative">
-                  {screenshot && screenshot.filepath && !imageErrors[index] ? (
-                    <img 
-                      src={`http://10.85.0.100:3001${screenshot.filepath}`}
-                      alt={`Screenshot ${index + 1}`} 
-                      className="w-20 h-20 object-cover" 
-                      onError={() => handleImageError(index)}
-                    />
-                  ) : (
-                    <div className="w-20 h-20 bg-gray-200 flex items-center justify-center text-sm text-gray-500">
-                      Image not found
-                    </div>
-                  )}
+                  <img 
+                    src={`http://10.85.0.100:3001${screenshot.filepath}`}
+                    alt={`Screenshot ${index + 1}`} 
+                    className="w-20 h-20 object-cover" 
+                    onError={() => removeScreenshot(index)}
+                  />
                   <Button
                     type="button"
                     variant="destructive"
