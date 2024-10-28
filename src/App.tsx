@@ -56,6 +56,25 @@ const MainApp: React.FC = () => {
   const [selectedChange, setSelectedChange] = useState<Change | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+  const { logout } = useAuth();
+
+  // Add error interceptor for axios
+  useEffect(() => {
+    const interceptor = axios.interceptors.response.use(
+      response => response,
+      error => {
+        if (error.response?.status === 401 || error.response?.status === 403) {
+          toast.error('Authentication expired. Please login again.');
+          logout();
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    return () => {
+      axios.interceptors.response.eject(interceptor);
+    };
+  }, [logout]);
 
   const fetchUsers = async () => {
     try {

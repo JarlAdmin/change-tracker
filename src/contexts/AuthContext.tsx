@@ -35,6 +35,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(newUser);
     localStorage.setItem('token', newToken);
     localStorage.setItem('user', JSON.stringify(newUser));
+    // Set default authorization header for all future requests
     axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
   };
 
@@ -43,6 +44,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    // Remove authorization header
     delete axios.defaults.headers.common['Authorization'];
   };
 
