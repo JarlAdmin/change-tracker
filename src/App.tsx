@@ -45,6 +45,7 @@ import {
   ChevronsLeft,  // Changed from DoubleArrowLeft
   ChevronsRight, // Changed from DoubleArrowRight
 } from "lucide-react";
+import { ThemeProvider } from "./components/theme-provider";
 
 // Protected Route component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -590,21 +591,28 @@ const MainApp: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <Routes>
-          <Route path="/signin" element={<SignIn />} />
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <MainApp />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </AuthProvider>
-    </BrowserRouter>
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
+      <BrowserRouter>
+        <AuthProvider>
+          <Routes>
+            <Route path="/signin" element={<SignIn />} />
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <MainApp />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </AuthProvider>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 };
 
