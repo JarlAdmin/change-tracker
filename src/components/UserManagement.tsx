@@ -35,6 +35,8 @@ const UserManagement: React.FC<UserManagementProps> = ({ isOpen, onClose }) => {
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
   const { user: currentUser } = useAuth();
 
+  const isAdmin = currentUser?.username === 'Admin';
+
   useEffect(() => {
     if (isOpen) {
       fetchUsers();
@@ -151,26 +153,28 @@ const UserManagement: React.FC<UserManagementProps> = ({ isOpen, onClose }) => {
         </DialogHeader>
 
         <div className="flex flex-col space-y-6">
-          {/* Add User Section */}
-          <div className="flex items-center space-x-4 p-4 bg-secondary/20 rounded-lg">
-            <div className="flex-1 space-y-2">
-              <Input
-                placeholder="Enter username"
-                value={newUsername}
-                onChange={(e) => setNewUsername(e.target.value)}
-              />
-              <Input
-                type="password"
-                placeholder="Enter password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-              />
+          {/* Only show Add User section if current user is Admin */}
+          {isAdmin && (
+            <div className="flex items-center space-x-4 p-4 bg-secondary/20 rounded-lg">
+              <div className="flex-1 space-y-2">
+                <Input
+                  placeholder="Enter username"
+                  value={newUsername}
+                  onChange={(e) => setNewUsername(e.target.value)}
+                />
+                <Input
+                  type="password"
+                  placeholder="Enter password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                />
+              </div>
+              <Button onClick={addUser} className="flex items-center">
+                <Plus className="mr-2 h-4 w-4" />
+                Add User
+              </Button>
             </div>
-            <Button onClick={addUser} className="flex items-center">
-              <Plus className="mr-2 h-4 w-4" />
-              Add User
-            </Button>
-          </div>
+          )}
 
           {/* User List Section */}
           <ScrollArea className="flex-1 max-h-[400px] pr-4">
@@ -204,7 +208,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ isOpen, onClose }) => {
                         Change Password
                       </Button>
                     )}
-                    {user.username !== 'Admin' && currentUser?.username === 'Admin' && (
+                    {user.username !== 'Admin' && isAdmin && (
                       <Button
                         variant="ghost"
                         size="icon"
