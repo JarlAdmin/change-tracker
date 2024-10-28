@@ -17,6 +17,7 @@ import { Change } from '../types/change';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { X } from "lucide-react";
+import { UserAvatar } from './UserAvatar';
 
 interface Screenshot {
   id: number;
@@ -191,12 +192,22 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
             <Label htmlFor="user-id">User</Label>
             <Select value={userId.toString()} onValueChange={(value) => setUserId(Number(value))}>
               <SelectTrigger id="user-id">
-                <SelectValue placeholder="Select User" />
+                <SelectValue placeholder="Select User">
+                  {users.find(u => u.id === userId) && (
+                    <div className="flex items-center gap-2">
+                      <UserAvatar username={users.find(u => u.id === userId)!.username} />
+                      <span>{users.find(u => u.id === userId)!.username}</span>
+                    </div>
+                  )}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {users.map((user) => (
                   <SelectItem key={user.id} value={user.id.toString()}>
-                    {user.username}
+                    <div className="flex items-center gap-2">
+                      <UserAvatar username={user.username} />
+                      <span>{user.username}</span>
+                    </div>
                   </SelectItem>
                 ))}
               </SelectContent>

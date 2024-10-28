@@ -30,6 +30,7 @@ import ServiceFilter from './components/ServiceFilter';
 import { toast } from 'react-hot-toast';
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from './components/AppSidebar';
+import { UserAvatar } from './components/UserAvatar';
 
 const API_BASE_URL = 'http://10.85.0.100:3001';
 
@@ -213,7 +214,12 @@ const App: React.FC = () => {
       cell: ({ row }) => {
         const userId = row.getValue("user_id") as number;
         const user = users.find(u => u.id === userId);
-        return user ? user.username : 'Unknown';
+        return (
+          <div className="flex items-center gap-2">
+            {user && <UserAvatar username={user.username} />}
+            <span>{user ? user.username : 'Unknown'}</span>
+          </div>
+        );
       },
     },
     {
