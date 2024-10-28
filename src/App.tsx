@@ -203,6 +203,35 @@ const MainApp: React.FC = () => {
           </Button>
         )
       },
+      cell: ({ row }) => {
+        const details = row.getValue("change_details") as string;
+        const lines = details.split('\n');
+        const shouldTruncate = lines.length > 4 || details.length > 200;
+        
+        const displayText = shouldTruncate
+          ? lines.slice(0, 4).join('\n').substring(0, 200)
+          : details;
+
+        return (
+          <div className="max-w-[500px]">
+            <span className="whitespace-pre-wrap">{displayText}</span>
+            {shouldTruncate && (
+              <>
+                ...{' '}
+                <button
+                  onClick={() => {
+                    setSelectedChange(row.original);
+                    setIsViewDialogOpen(true);
+                  }}
+                  className="text-blue-500 hover:text-blue-700 font-medium"
+                >
+                  Read more
+                </button>
+              </>
+            )}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "category",
