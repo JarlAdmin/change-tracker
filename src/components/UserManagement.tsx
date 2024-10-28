@@ -8,7 +8,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import { Input } from "./ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from 'react-hot-toast';
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
