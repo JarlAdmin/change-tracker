@@ -591,7 +591,7 @@ const MainApp: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <ThemeProvider defaultTheme="system">
+    <ThemeProvider defaultTheme="light"> {/* Changed from "system" to "light" */}
       <BrowserRouter>
         <AuthProvider>
           <Routes>
