@@ -15,6 +15,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Plus, Trash2 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Label } from "./ui/label";
+import { useAuth } from '@/contexts/AuthContext';
 
 interface User {
   id: number;
@@ -32,6 +33,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ isOpen, onClose }) => {
   const [newPassword, setNewPassword] = useState('');
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
+  const { user: currentUser } = useAuth();
 
   useEffect(() => {
     if (isOpen) {
@@ -100,14 +102,19 @@ const UserManagement: React.FC<UserManagementProps> = ({ isOpen, onClose }) => {
 
     try {
       await axios.put(`http://10.85.0.100:3001/api/users/${selectedUserId}/password`, {
-        password: newPassword
+        password: newPassword,
+        requestingUser: currentUser?.username // Add this to verify on server
       });
       setNewPassword('');
       setSelectedUserId(null);
       setIsPasswordDialogOpen(false);
       toast.success('Password updated successfully');
-    } catch (error) {
-      toast.error('Error updating password');
+    } catch (error: any) {
+      if (error.response?.data?.message) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error('Error updating password');
+      }
     }
   };
 
@@ -122,6 +129,15 @@ const UserManagement: React.FC<UserManagementProps> = ({ isOpen, onClose }) => {
     ];
     const index = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
     return colors[index % colors.length];
+  };
+
+  const canChangePassword = (targetUser: User) => {
+    // Admin can change any user's password
+    if (currentUser?.username === 'Admin') {
+      return true;
+    }
+    // Non-admin users can only change their own password
+    return currentUser?.id === targetUser.id;
   };
 
   return (
@@ -176,17 +192,19 @@ const UserManagement: React.FC<UserManagementProps> = ({ isOpen, onClose }) => {
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setSelectedUserId(user.id);
-                        setIsPasswordDialogOpen(true);
-                      }}
-                    >
-                      Change Password
-                    </Button>
-                    {user.username !== 'Admin' && (
+                    {canChangePassword(user) && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedUserId(user.id);
+                          setIsPasswordDialogOpen(true);
+                        }}
+                      >
+                        Change Password
+                      </Button>
+                    )}
+                    {user.username !== 'Admin' && currentUser?.username === 'Admin' && (
                       <Button
                         variant="ghost"
                         size="icon"
