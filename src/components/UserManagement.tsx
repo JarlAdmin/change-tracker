@@ -67,12 +67,26 @@ const UserManagement: React.FC<UserManagementProps> = ({ isOpen, onClose }) => {
 
   const deleteUser = async (userId: number) => {
     try {
+      // First check if user has any associated changes
+      const changesResponse = await axios.get(`http://10.85.0.100:3001/api/changes`);
+      const userHasChanges = changesResponse.data.some((change: any) => change.user_id === userId);
+      
+      if (userHasChanges) {
+        toast.error('Cannot delete user: This user has associated changes. Please delete or reassign their changes first.');
+        return;
+      }
+
+      // If no changes are associated, proceed with deletion
       await axios.delete(`http://10.85.0.100:3001/api/users/${userId}`);
       toast.success('User deleted successfully');
       fetchUsers();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting user:', error);
-      toast.error('Failed to delete user');
+      if (error.response?.data?.message) {
+        toast.error(`Failed to delete user: ${error.response.data.message}`);
+      } else {
+        toast.error('Failed to delete user. Please try again.');
+      }
     }
   };
 
