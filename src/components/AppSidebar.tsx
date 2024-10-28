@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Home, Users, LogOut, ChevronUp, User } from "lucide-react";
+import { Home, Users, LogOut, ChevronUp, ClipboardList } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sidebar,
@@ -11,6 +11,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarFooter,
+  SidebarHeader,
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import UserManagement from './UserManagement';
@@ -51,9 +52,23 @@ export function AppSidebar({ onUserAdded }: AppSidebarProps) {
 
   return (
     <Sidebar>
+      <SidebarHeader className="border-b">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton className="flex items-center gap-2">
+              <ClipboardList className="h-6 w-6" />
+              <div className="flex flex-col">
+                <span className="font-semibold">Change Tracker</span>
+                <span className="text-xs text-muted-foreground">Track your changes</span>
+              </div>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
+
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Change Tracker</SidebarGroupLabel>
+          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <Separator className="my-2" />
           <SidebarGroupContent>
             <SidebarMenu>
