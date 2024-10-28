@@ -29,41 +29,37 @@ export function ThemeProvider({
   ...props
 }: ThemeProviderProps) {
   const [theme, setTheme] = React.useState<Theme>(() => {
-    const storedTheme = localStorage.getItem(storageKey) as Theme
-    console.log('Initial theme from storage:', storedTheme)
-    return storedTheme || defaultTheme
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem(storageKey) as Theme) || defaultTheme
+    }
+    return defaultTheme
   })
 
   React.useEffect(() => {
     const root = window.document.documentElement
-    console.log('Applying theme:', theme)
-
-    // First, remove both classes
-    root.classList.remove('light', 'dark')
 
     if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
-      console.log('System theme:', systemTheme)
-      root.classList.add(systemTheme)
+      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
+      
+      const updateTheme = () => {
+        root.classList.remove('light', 'dark')
+        root.classList.add(mediaQuery.matches ? 'dark' : 'light')
+      }
+
+      updateTheme()
+      mediaQuery.addEventListener('change', updateTheme)
+
+      return () => mediaQuery.removeEventListener('change', updateTheme)
     } else {
-      console.log('Adding theme class:', theme)
+      root.classList.remove('light', 'dark')
       root.classList.add(theme)
     }
-
-    // Force a repaint to ensure the theme is applied
-    const body = document.body;
-    body.style.display = 'none';
-    // Use void to explicitly ignore the return value
-    void body.offsetHeight; // Force reflow
-    body.style.display = '';
-
   }, [theme])
 
   const value = React.useMemo(
     () => ({
       theme,
       setTheme: (newTheme: Theme) => {
-        console.log('Setting new theme:', newTheme)
         localStorage.setItem(storageKey, newTheme)
         setTheme(newTheme)
       },
