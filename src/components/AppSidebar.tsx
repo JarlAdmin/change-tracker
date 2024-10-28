@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Home, Calendar, Settings, PlusCircle, List, UserPlus, Users } from "lucide-react";
+import { Home, UserPlus, Users } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -21,28 +21,8 @@ const items = [
     icon: Home,
   },
   {
-    title: "Add Change",
-    url: "#",
-    icon: PlusCircle,
-  },
-  {
-    title: "View Changes",
-    url: "#",
-    icon: List,
-  },
-  {
-    title: "Calendar",
-    url: "#",
-    icon: Calendar,
-  },
-  {
     title: "User Management",
     icon: Users,
-  },
-  {
-    title: "Settings",
-    url: "#",
-    icon: Settings,
   },
 ];
 
