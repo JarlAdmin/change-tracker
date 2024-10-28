@@ -32,6 +32,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from './components/AppSidebar';
 import { UserAvatar } from './components/UserAvatar';
 import { CategoryWithIcon, ServiceWithIcon } from './components/ServiceIcon';
+import DateTimeFilter from './components/DateTimeFilter';
 
 const API_BASE_URL = 'http://10.85.0.100:3001';
 
@@ -44,6 +45,7 @@ const App: React.FC = () => {
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [serviceFilter, setServiceFilter] = useState<string>('all');
   const [users, setUsers] = useState<Array<{ id: number; username: string }>>([]);
+  const [dateFilter, setDateFilter] = useState<Date | null>(null);
 
   const fetchUsers = async () => {
     try {
@@ -121,6 +123,7 @@ const App: React.FC = () => {
     setGlobalFilter('');
     setCategoryFilter('all');
     setServiceFilter('all');
+    setDateFilter(null);
   };
 
   const columns: ColumnDef<Change>[] = [
@@ -263,9 +266,15 @@ const App: React.FC = () => {
         change.category.toLowerCase().includes(globalFilter.toLowerCase()) ||
         change.service.toLowerCase().includes(globalFilter.toLowerCase()) ||
         (user ? user.username.toLowerCase().includes(globalFilter.toLowerCase()) : false);
-      return matchesCategory && matchesService && matchesGlobalFilter;
+      
+      // Add date filter
+      const matchesDate = !dateFilter || 
+        new Date(change.date).getTime() >= new Date(dateFilter).setHours(0, 0, 0, 0) &&
+        new Date(change.date).getTime() < new Date(dateFilter).setHours(23, 59, 59, 999);
+
+      return matchesCategory && matchesService && matchesGlobalFilter && matchesDate;
     });
-  }, [changes, categoryFilter, serviceFilter, globalFilter, users]);
+  }, [changes, categoryFilter, serviceFilter, globalFilter, users, dateFilter]);
 
   const table = useReactTable({
     data: filteredChanges,
@@ -315,6 +324,11 @@ const App: React.FC = () => {
                 services={uniqueServices}
                 value={serviceFilter}
                 onChange={setServiceFilter}
+              />
+              <DateTimeFilter
+                value={dateFilter}
+                onChange={setDateFilter}
+                onClear={() => setDateFilter(null)}
               />
               <Button
                 variant="outline"
