@@ -18,6 +18,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import axios from 'axios';
 import { UserAvatar } from './UserAvatar';
+import { ServiceIcon } from './ServiceIcon';
 
 interface AddChangeDialogProps {
   isOpen: boolean;
@@ -139,9 +140,24 @@ const AddChangeDialog: React.FC<AddChangeDialogProps> = ({ isOpen, onClose, onAd
                 <SelectValue placeholder="Select Category" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Microsoft">Microsoft</SelectItem>
-                <SelectItem value="On Premise">On Premise</SelectItem>
-                <SelectItem value="General Changes">General Changes</SelectItem>
+                <SelectItem value="Microsoft">
+                  <div className="flex items-center gap-2">
+                    <ServiceIcon category="Microsoft" />
+                    <span>Microsoft</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="On Premise">
+                  <div className="flex items-center gap-2">
+                    <ServiceIcon category="On Premise" />
+                    <span>On Premise</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="General Changes">
+                  <div className="flex items-center gap-2">
+                    <ServiceIcon category="General Changes" />
+                    <span>General Changes</span>
+                  </div>
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -155,18 +171,58 @@ const AddChangeDialog: React.FC<AddChangeDialogProps> = ({ isOpen, onClose, onAd
                 <SelectContent>
                   {category === 'Microsoft' && (
                     <>
-                      <SelectItem value="Azure">Azure</SelectItem>
-                      <SelectItem value="Intune">Intune</SelectItem>
-                      <SelectItem value="Exchange">Exchange</SelectItem>
-                      <SelectItem value="Defender">Microsoft Defender</SelectItem>
-                      <SelectItem value="Entra">Microsoft Entra</SelectItem>
-                      <SelectItem value="Teams">Microsoft Teams</SelectItem>
+                      <SelectItem value="Azure">
+                        <div className="flex items-center gap-2">
+                          <ServiceIcon category="Microsoft" service="Azure" />
+                          <span>Azure</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="Intune">
+                        <div className="flex items-center gap-2">
+                          <ServiceIcon category="Microsoft" service="Intune" />
+                          <span>Intune</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="Exchange">
+                        <div className="flex items-center gap-2">
+                          <ServiceIcon category="Microsoft" service="Exchange" />
+                          <span>Exchange</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="Defender">
+                        <div className="flex items-center gap-2">
+                          <ServiceIcon category="Microsoft" service="Defender" />
+                          <span>Microsoft Defender</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="Entra">
+                        <div className="flex items-center gap-2">
+                          <ServiceIcon category="Microsoft" service="Entra" />
+                          <span>Microsoft Entra</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="Teams">
+                        <div className="flex items-center gap-2">
+                          <ServiceIcon category="Microsoft" service="Teams" />
+                          <span>Microsoft Teams</span>
+                        </div>
+                      </SelectItem>
                     </>
                   )}
                   {category === 'On Premise' && (
                     <>
-                      <SelectItem value="Active Directory">Active Directory</SelectItem>
-                      <SelectItem value="Network">Network</SelectItem>
+                      <SelectItem value="Active Directory">
+                        <div className="flex items-center gap-2">
+                          <ServiceIcon category="On Premise" service="Active Directory" />
+                          <span>Active Directory</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="Network">
+                        <div className="flex items-center gap-2">
+                          <ServiceIcon category="On Premise" service="Network" />
+                          <span>Network</span>
+                        </div>
+                      </SelectItem>
                     </>
                   )}
                 </SelectContent>

@@ -31,6 +31,7 @@ import { toast } from 'react-hot-toast';
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from './components/AppSidebar';
 import { UserAvatar } from './components/UserAvatar';
+import { CategoryWithIcon, ServiceWithIcon } from './components/ServiceIcon';
 
 const API_BASE_URL = 'http://10.85.0.100:3001';
 
@@ -183,6 +184,9 @@ const App: React.FC = () => {
           </Button>
         )
       },
+      cell: ({ row }) => (
+        <CategoryWithIcon category={row.getValue("category")} />
+      ),
     },
     {
       accessorKey: "service",
@@ -197,6 +201,12 @@ const App: React.FC = () => {
           </Button>
         )
       },
+      cell: ({ row }) => (
+        <ServiceWithIcon 
+          category={row.getValue("category")} 
+          service={row.getValue("service")} 
+        />
+      ),
     },
     {
       accessorKey: "user_id",

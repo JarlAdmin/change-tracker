@@ -5,6 +5,7 @@ import { Label } from './ui/label'
 import { Change } from '../types/change'
 import axios from 'axios';
 import { UserAvatar } from './UserAvatar';
+import { CategoryWithIcon, ServiceWithIcon } from './ServiceIcon';
 
 interface ViewChangeDialogProps {
   isOpen: boolean;
@@ -58,11 +59,18 @@ const ViewChangeDialog: React.FC<ViewChangeDialogProps> = ({ isOpen, onClose, ch
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <Label>Category</Label>
-                  <p className="text-sm">{change.category}</p>
+                  <div className="text-sm">
+                    <CategoryWithIcon category={change.category} />
+                  </div>
                 </div>
                 <div className="space-y-1">
                   <Label>Service</Label>
-                  <p className="text-sm">{change.service}</p>
+                  <div className="text-sm">
+                    <ServiceWithIcon 
+                      category={change.category} 
+                      service={change.service} 
+                    />
+                  </div>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
