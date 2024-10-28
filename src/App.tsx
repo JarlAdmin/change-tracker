@@ -591,12 +591,7 @@ const MainApp: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="system"
-      enableSystem
-      disableTransitionOnChange
-    >
+    <ThemeProvider defaultTheme="system">
       <BrowserRouter>
         <AuthProvider>
           <Routes>
