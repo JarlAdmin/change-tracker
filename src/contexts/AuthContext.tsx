@@ -21,6 +21,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Add token refresh function
+  const refreshToken = async (currentToken: string) => {
+    try {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${currentToken}`;
+      const response = await axios.get('http://10.85.0.100:3001/api/verify-token');
+      
+      // Update token if a new one was provided
+      if (response.data.token) {
+        setToken(response.data.token);
+        localStorage.setItem('token', response.data.token);
+        axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('Token refresh failed:', error);
+      return false;
+    }
+  };
+
+  // Update initialization
   useEffect(() => {
     const initializeAuth = async () => {
       const storedToken = localStorage.getItem('token');
@@ -28,18 +49,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (storedToken && storedUser) {
         try {
-          // Set the token in axios headers
-          axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
+          const isValid = await refreshToken(storedToken);
           
-          // Verify token by making a request to the API
-          await axios.get('http://10.85.0.100:3001/api/verify-token');
-          
-          // If the request succeeds, set the auth state
-          setToken(storedToken);
-          setUser(JSON.parse(storedUser));
+          if (isValid) {
+            setUser(JSON.parse(storedUser));
+          } else {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            delete axios.defaults.headers.common['Authorization'];
+          }
         } catch (error) {
-          // If verification fails, clear the stored data
-          console.error('Token verification failed:', error);
+          console.error('Auth initialization failed:', error);
           localStorage.removeItem('token');
           localStorage.removeItem('user');
           delete axios.defaults.headers.common['Authorization'];
@@ -50,6 +70,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     initializeAuth();
   }, []);
+
+  // Add periodic token refresh
+  useEffect(() => {
+    if (!token) return;
+
+    const refreshInterval = setInterval(async () => {
+      const isValid = await refreshToken(token);
+      if (!isValid) {
+        logout();
+      }
+    }, 5 * 60 * 1000); // Refresh every 5 minutes
+
+    return () => clearInterval(refreshInterval);
+  }, [token]);
 
   const login = (newToken: string, newUser: User) => {
     setToken(newToken);
