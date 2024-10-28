@@ -74,3 +74,28 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Add this to your existing globals.css */
+.theme-transition,
+.theme-transition *,
+.theme-transition *:before,
+.theme-transition *:after {
+  transition: all 0.3s ease-in-out !important;
+  transition-delay: 0 !important;
+}
+
+/* Smooth background transitions */
+:root {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Smooth transitions for common elements */
+body,
+.bg-background,
+.bg-card,
+.border-border,
+.text-foreground,
+[class*="hover:bg-"],
+[class*="hover:text-"] {
+  transition: all 0.3s ease-in-out;
+}

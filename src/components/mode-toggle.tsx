@@ -9,16 +9,18 @@ export function ModeToggle() {
   const { theme, setTheme } = useTheme()
 
   const toggleTheme = () => {
+    // Add transition class before theme change
+    document.documentElement.classList.add('theme-transition');
+    
+    // Set a timeout to remove the transition class
+    setTimeout(() => {
+      document.documentElement.classList.remove('theme-transition');
+    }, 500); // Match this with the CSS transition duration
+    
+    // Toggle theme
     const newTheme = theme === "light" ? "dark" : "light";
     setTheme(newTheme);
-    
-    // Store the theme in localStorage
     localStorage.setItem('vite-ui-theme', newTheme);
-    
-    // Reload the page after a short delay to ensure the theme is applied
-    setTimeout(() => {
-      window.location.reload();
-    }, 150); // Small delay to ensure the theme is saved
   }
 
   return (
