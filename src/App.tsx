@@ -35,6 +35,9 @@ import {
   TableHeader,
   TableRow,
 } from "./components/ui/table";
+import { Checkbox } from "./components/ui/checkbox";
+import { Eye, Pencil, Trash2 } from "lucide-react";
+import { CategoryWithIcon, ServiceWithIcon } from './components/ServiceIcon';
 
 // Protected Route component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -93,9 +96,16 @@ const MainApp: React.FC = () => {
   const fetchChanges = async () => {
     try {
       const response = await axios.get('http://10.85.0.100:3001/api/changes');
+      console.log('Changes response:', response.data);
       setChanges(response.data);
     } catch (error) {
       console.error('Error fetching changes:', error);
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        toast.error('Session expired. Please login again.');
+        logout();
+      } else {
+        toast.error('Failed to fetch changes');
+      }
     }
   };
 
@@ -140,7 +150,167 @@ const MainApp: React.FC = () => {
   };
 
   const columns: ColumnDef<Change>[] = [
-    // ... your column definitions
+    {
+      id: "select",
+      header: ({ table }) => (
+        <Checkbox
+          checked={table.getIsAllPageRowsSelected()}
+          onCheckedChange={(checked: boolean) => table.toggleAllPageRowsSelected(!!checked)}
+          aria-label="Select all"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(checked: boolean) => row.toggleSelected(!!checked)}
+          aria-label="Select row"
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
+    {
+      accessorKey: "id",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            ID
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        )
+      },
+    },
+    {
+      accessorKey: "change_details",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Change Details
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        )
+      },
+    },
+    {
+      accessorKey: "category",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Category
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        )
+      },
+      cell: ({ row }) => (
+        <CategoryWithIcon category={row.getValue("category")} />
+      ),
+    },
+    {
+      accessorKey: "service",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Service
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        )
+      },
+      cell: ({ row }) => (
+        <ServiceWithIcon 
+          category={row.getValue("category")} 
+          service={row.getValue("service")} 
+        />
+      ),
+    },
+    {
+      accessorKey: "user_id",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Username
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        )
+      },
+      cell: ({ row }) => {
+        const userId = row.getValue("user_id") as number;
+        const user = users.find(u => u.id === userId);
+        return (
+          <div className="flex items-center gap-2">
+            {user && <UserAvatar username={user.username} />}
+            <span>{user ? user.username : 'Unknown'}</span>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "date",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Date
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        )
+      },
+      cell: ({ row }) => new Date(row.getValue("date")).toLocaleString(),
+    },
+    {
+      id: "actions",
+      cell: ({ row }) => {
+        const change = row.original;
+        return (
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => {
+                setSelectedChange(change);
+                setIsViewDialogOpen(true);
+              }}
+            >
+              <Eye className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => {
+                setSelectedChange(change);
+                setIsEditDialogOpen(true);
+              }}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-destructive hover:text-destructive hover:bg-destructive/10"
+              onClick={() => deleteChange(change.id)}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        );
+      },
+    },
   ];
 
   const filteredChanges = useMemo(() => {
