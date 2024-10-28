@@ -19,6 +19,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import axios from 'axios';
 import { UserAvatar } from './UserAvatar';
 import { ServiceIcon } from './ServiceIcon';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface AddChangeDialogProps {
   isOpen: boolean;
@@ -35,6 +36,7 @@ const AddChangeDialog: React.FC<AddChangeDialogProps> = ({ isOpen, onClose, onAd
   const [screenshots, setScreenshots] = useState<File[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [users, setUsers] = useState<Array<{ id: number, username: string }>>([]);
+  const { user: currentUser } = useAuth();
 
   useEffect(() => {
     fetchUsers();
@@ -44,15 +46,21 @@ const AddChangeDialog: React.FC<AddChangeDialogProps> = ({ isOpen, onClose, onAd
     try {
       const response = await axios.get('http://10.85.0.100:3001/api/users');
       setUsers(response.data);
-      // Set Admin as default user
-      const adminUser = response.data.find((user: { username: string }) => user.username === 'Admin');
-      if (adminUser) {
-        setUserId(adminUser.id);
+      // Set current user as default instead of Admin
+      if (currentUser) {
+        setUserId(currentUser.id);
       }
     } catch (error) {
       console.error('Error fetching users:', error);
     }
   };
+
+  // When dialog opens, reset form and set current user
+  useEffect(() => {
+    if (isOpen && currentUser) {
+      setUserId(currentUser.id);
+    }
+  }, [isOpen, currentUser]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -96,7 +104,8 @@ const AddChangeDialog: React.FC<AddChangeDialogProps> = ({ isOpen, onClose, onAd
     setCategory('');
     setService('');
     setChangeDate(new Date());
-    setUserId(null);
+    // Don't reset userId to null, instead set it to current user's ID
+    setUserId(currentUser?.id || null);
     setScreenshots([]);
     setError(null);
     onClose();
