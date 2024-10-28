@@ -51,9 +51,11 @@ export function ThemeProvider({
     }
 
     // Force a repaint to ensure the theme is applied
-    document.body.style.display = 'none'
-    document.body.offsetHeight // Force reflow
-    document.body.style.display = ''
+    const body = document.body;
+    body.style.display = 'none';
+    // Use void to explicitly ignore the return value
+    void body.offsetHeight; // Force reflow
+    body.style.display = '';
 
   }, [theme])
 
