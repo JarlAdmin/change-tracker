@@ -30,34 +30,41 @@ export function ThemeProvider({
 }: ThemeProviderProps) {
   // Initialize theme from localStorage or default
   const [theme, setTheme] = React.useState<Theme>(() => {
-    // Clear existing theme from localStorage to start fresh
-    localStorage.removeItem(storageKey);
-    return defaultTheme;
+    const storedTheme = localStorage.getItem(storageKey) as Theme | null;
+    return storedTheme || defaultTheme;
   });
 
-  // Apply theme effect
+  // Handle system theme changes
+  React.useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    
+    const handleSystemThemeChange = () => {
+      if (theme === 'system') {
+        const root = window.document.documentElement;
+        root.classList.remove('light', 'dark');
+        root.classList.add(mediaQuery.matches ? 'dark' : 'light');
+      }
+    };
+
+    mediaQuery.addEventListener('change', handleSystemThemeChange);
+    return () => mediaQuery.removeEventListener('change', handleSystemThemeChange);
+  }, [theme]);
+
+  // Apply theme
   React.useEffect(() => {
     const root = window.document.documentElement;
-    
-    // First, remove any existing theme classes
     root.classList.remove('light', 'dark');
 
-    // Apply the appropriate theme
     if (theme === 'system') {
-      // Check system preference
       const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
       root.classList.add(systemTheme);
-      console.log('Applied system theme:', systemTheme);
     } else {
       root.classList.add(theme);
-      console.log('Applied theme:', theme);
     }
 
-    // Store the theme preference
     localStorage.setItem(storageKey, theme);
   }, [theme, storageKey]);
 
-  // Create memoized context value
   const value = React.useMemo(
     () => ({
       theme,
