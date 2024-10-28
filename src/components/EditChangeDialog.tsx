@@ -37,7 +37,13 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
   const [service, setService] = useState(change.service);
   const [changeDate, setChangeDate] = useState<Date>(new Date(change.date));
   const [userId, setUserId] = useState<number>(change.user_id);
-  const [screenshots, setScreenshots] = useState<Screenshot[]>(change.screenshots.filter(screenshot => screenshot.id !== null && screenshot.filepath !== null) || []);
+  const [screenshots, setScreenshots] = useState<Screenshot[]>(
+    change.screenshots
+      .filter((screenshot): screenshot is Screenshot => 
+        screenshot.id !== null && 
+        screenshot.filepath !== null
+      )
+  );
   const [newScreenshots, setNewScreenshots] = useState<File[]>([]);
   const [users, setUsers] = useState<Array<{ id: number, username: string }>>([]);
 
@@ -63,7 +69,16 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
     setService(change.service);
     setChangeDate(new Date(change.date));
     setUserId(change.user_id);
-    setScreenshots(change.screenshots.filter(screenshot => screenshot.id !== null && screenshot.filepath !== null) || []);
+    
+    // Filter out null values and cast to Screenshot type
+    setScreenshots(
+      change.screenshots
+        .filter((screenshot): screenshot is Screenshot => 
+          screenshot.id !== null && 
+          screenshot.filepath !== null
+        )
+    );
+    
     setNewScreenshots([]);
   }, [change]);
 

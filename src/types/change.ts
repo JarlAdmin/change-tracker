@@ -1,9 +1,12 @@
 export interface Change {
   id: number;
   change_details: string;
-  date: string;
   category: string;
   service: string;
+  date: string;
   user_id: number;
-  screenshots: Array<{ id: number, filepath: string }>;
+  screenshots: Array<{
+    id: number | null;
+    filepath: string | null;
+  }>;
 }

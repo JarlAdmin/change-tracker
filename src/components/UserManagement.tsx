@@ -6,6 +6,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ import { toast } from 'react-hot-toast';
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Plus, Trash2 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Label } from "./ui/label";
 
 interface User {
   id: number;
@@ -27,6 +29,9 @@ interface UserManagementProps {
 const UserManagement: React.FC<UserManagementProps> = ({ isOpen, onClose }) => {
   const [users, setUsers] = useState<User[]>([]);
   const [newUsername, setNewUsername] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -45,18 +50,22 @@ const UserManagement: React.FC<UserManagementProps> = ({ isOpen, onClose }) => {
   };
 
   const addUser = async () => {
-    if (!newUsername.trim()) {
-      toast.error('Username cannot be empty');
+    if (!newUsername.trim() || !newPassword.trim()) {
+      toast.error('Username and password are required');
       return;
     }
+
     try {
-      await axios.post('http://10.85.0.100:3001/api/users', { username: newUsername });
-      toast.success('User added successfully');
+      const response = await axios.post('http://10.85.0.100:3001/api/users', {
+        username: newUsername,
+        password: newPassword
+      });
+      setUsers([...users, response.data]);
       setNewUsername('');
-      fetchUsers();
+      setNewPassword('');
+      toast.success('User added successfully');
     } catch (error) {
-      console.error('Error adding user:', error);
-      toast.error('Failed to add user');
+      toast.error('Error adding user');
     }
   };
 
@@ -80,6 +89,25 @@ const UserManagement: React.FC<UserManagementProps> = ({ isOpen, onClose }) => {
       } else {
         toast.error('Failed to delete user. Please try again.');
       }
+    }
+  };
+
+  const updatePassword = async () => {
+    if (!selectedUserId || !newPassword.trim()) {
+      toast.error('Password is required');
+      return;
+    }
+
+    try {
+      await axios.put(`http://10.85.0.100:3001/api/users/${selectedUserId}/password`, {
+        password: newPassword
+      });
+      setNewPassword('');
+      setSelectedUserId(null);
+      setIsPasswordDialogOpen(false);
+      toast.success('Password updated successfully');
+    } catch (error) {
+      toast.error('Error updating password');
     }
   };
 
@@ -109,12 +137,19 @@ const UserManagement: React.FC<UserManagementProps> = ({ isOpen, onClose }) => {
         <div className="flex flex-col space-y-6">
           {/* Add User Section */}
           <div className="flex items-center space-x-4 p-4 bg-secondary/20 rounded-lg">
-            <Input
-              placeholder="Enter username"
-              value={newUsername}
-              onChange={(e) => setNewUsername(e.target.value)}
-              className="flex-1"
-            />
+            <div className="flex-1 space-y-2">
+              <Input
+                placeholder="Enter username"
+                value={newUsername}
+                onChange={(e) => setNewUsername(e.target.value)}
+              />
+              <Input
+                type="password"
+                placeholder="Enter password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
+            </div>
             <Button onClick={addUser} className="flex items-center">
               <Plus className="mr-2 h-4 w-4" />
               Add User
@@ -140,21 +175,58 @@ const UserManagement: React.FC<UserManagementProps> = ({ isOpen, onClose }) => {
                       <p className="text-sm text-muted-foreground">User ID: {user.id}</p>
                     </div>
                   </div>
-                  {user.username !== 'Admin' && (
+                  <div className="flex items-center space-x-2">
                     <Button
-                      variant="ghost"
-                      size="icon"
-                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                      onClick={() => deleteUser(user.id)}
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedUserId(user.id);
+                        setIsPasswordDialogOpen(true);
+                      }}
                     >
-                      <Trash2 className="h-4 w-4" />
+                      Change Password
                     </Button>
-                  )}
+                    {user.username !== 'Admin' && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                        onClick={() => deleteUser(user.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
           </ScrollArea>
         </div>
+
+        <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Change Password</DialogTitle>
+              <DialogDescription>
+                Enter a new password for the selected user.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="new-password">New Password</Label>
+                <Input
+                  id="new-password"
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                />
+              </div>
+              <DialogFooter>
+                <Button onClick={updatePassword}>Update Password</Button>
+              </DialogFooter>
+            </div>
+          </DialogContent>
+        </Dialog>
       </DialogContent>
     </Dialog>
   );
