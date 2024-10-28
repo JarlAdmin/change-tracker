@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { Label } from './ui/label'
 import { Change } from '../types/change'
 import axios from 'axios';
+import { UserAvatar } from './UserAvatar';
 
 interface ViewChangeDialogProps {
   isOpen: boolean;
@@ -78,8 +79,11 @@ const ViewChangeDialog: React.FC<ViewChangeDialogProps> = ({ isOpen, onClose, ch
                   </p>
                 </div>
                 <div className="space-y-1">
-                  <Label>User Name</Label>
-                  <p className="text-sm">{username}</p>
+                  <Label>User</Label>
+                  <div className="flex items-center gap-2">
+                    {username && <UserAvatar username={username} size="sm" />}
+                    <p className="text-sm">{username}</p>
+                  </div>
                 </div>
               </div>
               {validScreenshots.length > 0 && (

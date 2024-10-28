@@ -4,9 +4,10 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 interface UserAvatarProps {
   username: string;
   className?: string;
+  size?: 'sm' | 'md' | 'lg';
 }
 
-export const UserAvatar: React.FC<UserAvatarProps> = ({ username, className }) => {
+export const UserAvatar: React.FC<UserAvatarProps> = ({ username, className, size = 'sm' }) => {
   const getInitials = (name: string) => {
     return name.charAt(0).toUpperCase();
   };
@@ -20,8 +21,14 @@ export const UserAvatar: React.FC<UserAvatarProps> = ({ username, className }) =
     return colors[index % colors.length];
   };
 
+  const sizeClasses = {
+    sm: 'h-6 w-6 text-xs',
+    md: 'h-8 w-8 text-sm',
+    lg: 'h-10 w-10 text-base'
+  };
+
   return (
-    <Avatar className={`h-8 w-8 ${getRandomColor(username)} ${className}`}>
+    <Avatar className={`${sizeClasses[size]} ${getRandomColor(username)} ${className}`}>
       <AvatarFallback className="text-white">
         {getInitials(username)}
       </AvatarFallback>
