@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Home, Users, LogOut, ChevronUp, ClipboardList, Trash2 } from "lucide-react";
+import { Home, Users, LogOut, ChevronUp, ClipboardList, Trash2, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sidebar,
@@ -26,6 +26,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ModeToggle } from './mode-toggle';
+import CategoryServiceManagement from './CategoryServiceManagement';
 
 const items = [
   {
@@ -42,6 +43,10 @@ const items = [
     url: "/deleted",
     icon: Trash2,
   },
+  {
+    title: "Category & Service Management",
+    icon: Settings,
+  },
 ];
 
 interface AppSidebarProps {
@@ -50,6 +55,7 @@ interface AppSidebarProps {
 
 export function AppSidebar({ onUserAdded }: AppSidebarProps) {
   const [isUserManagementOpen, setIsUserManagementOpen] = useState(false);
+  const [isCategoryServiceManagementOpen, setIsCategoryServiceManagementOpen] = useState(false);
   const { user, logout } = useAuth();
 
   const handleLogout = () => {
@@ -82,6 +88,11 @@ export function AppSidebar({ onUserAdded }: AppSidebarProps) {
                 <SidebarMenuItem key={item.title}>
                   {item.title === "User Management" ? (
                     <SidebarMenuButton onClick={() => setIsUserManagementOpen(true)}>
+                      <item.icon className="mr-2 h-4 w-4" />
+                      <span>{item.title}</span>
+                    </SidebarMenuButton>
+                  ) : item.title === "Category & Service Management" ? (
+                    <SidebarMenuButton onClick={() => setIsCategoryServiceManagementOpen(true)}>
                       <item.icon className="mr-2 h-4 w-4" />
                       <span>{item.title}</span>
                     </SidebarMenuButton>
@@ -138,6 +149,10 @@ export function AppSidebar({ onUserAdded }: AppSidebarProps) {
       <UserManagement
         isOpen={isUserManagementOpen}
         onClose={() => setIsUserManagementOpen(false)}
+      />
+      <CategoryServiceManagement
+        isOpen={isCategoryServiceManagementOpen}
+        onClose={() => setIsCategoryServiceManagementOpen(false)}
       />
     </Sidebar>
   );
