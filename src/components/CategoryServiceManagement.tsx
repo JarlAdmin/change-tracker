@@ -45,6 +45,15 @@ import {
   Cog,
   Trash2,
   Pencil,
+  Users,
+  Mail,
+  MessageSquare,
+  Building2,
+  FolderTree,
+  Share2,
+  Globe,
+  ShieldCheck,
+  Layers,
 } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -89,6 +98,15 @@ const AVAILABLE_ICONS = [
   { name: 'Wifi', component: Wifi },
   { name: 'Radio', component: Radio },
   { name: 'Cog', component: Cog },
+  { name: 'Users', component: Users },
+  { name: 'Mail', component: Mail },
+  { name: 'MessageSquare', component: MessageSquare },
+  { name: 'Building2', component: Building2 },
+  { name: 'FolderTree', component: FolderTree },
+  { name: 'Share2', component: Share2 },
+  { name: 'Globe', component: Globe },
+  { name: 'ShieldCheck', component: ShieldCheck },
+  { name: 'Layers', component: Layers },
 ];
 
 const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({

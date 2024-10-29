@@ -22,8 +22,15 @@ import {
   Wifi,
   Radio,
   Cog,
+  Users,
   Mail,
-  Users
+  MessageSquare,
+  Building2,
+  FolderTree,
+  Share2,
+  Globe,
+  ShieldCheck,
+  Layers,
 } from "lucide-react";
 
 const ICONS = {
@@ -49,8 +56,15 @@ const ICONS = {
   Wifi,
   Radio,
   Cog,
+  Users,
   Mail,
-  Users
+  MessageSquare,
+  Building2,
+  FolderTree,
+  Share2,
+  Globe,
+  ShieldCheck,
+  Layers,
 };
 
 interface IconComponentProps {
