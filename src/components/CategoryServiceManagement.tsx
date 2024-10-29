@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { toast } from 'react-hot-toast';
+import { useToast } from "@/components/ui/use-toast";
 import axios from 'axios';
 import {
   Server,
@@ -111,6 +111,8 @@ const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({
   const [editMode, setEditMode] = useState<'category' | 'service' | null>(null);
   const [editId, setEditId] = useState<number | null>(null);
 
+  const { toast } = useToast();
+
   useEffect(() => {
     if (isOpen) {
       fetchCategories();
@@ -124,7 +126,11 @@ const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({
       setCategories(response.data);
     } catch (error) {
       console.error('Error fetching categories:', error);
-      toast.error('Failed to fetch categories');
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to fetch categories",
+      });
     }
   };
 
@@ -134,13 +140,21 @@ const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({
       setServices(response.data);
     } catch (error) {
       console.error('Error fetching services:', error);
-      toast.error('Failed to fetch services');
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to fetch services",
+      });
     }
   };
 
   const handleAddCategory = async () => {
     if (!newCategoryName.trim() || !newCategoryIcon) {
-      toast.error('Please fill in all fields');
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please fill in all fields",
+      });
       return;
     }
 
@@ -152,16 +166,27 @@ const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({
       setCategories([...categories, response.data]);
       setNewCategoryName('');
       setNewCategoryIcon('');
-      toast.success('Category added successfully');
+      toast({
+        title: "Success",
+        description: "Category added successfully",
+      });
     } catch (error) {
       console.error('Error adding category:', error);
-      toast.error('Failed to add category');
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to add category",
+      });
     }
   };
 
   const handleAddService = async () => {
     if (!newServiceName.trim() || !newServiceIcon || !selectedCategoryId) {
-      toast.error('Please fill in all fields');
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please fill in all fields",
+      });
       return;
     }
 
@@ -175,10 +200,17 @@ const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({
       setNewServiceName('');
       setNewServiceIcon('');
       setSelectedCategoryId(null);
-      toast.success('Service added successfully');
+      toast({
+        title: "Success",
+        description: "Service added successfully",
+      });
     } catch (error) {
       console.error('Error adding service:', error);
-      toast.error('Failed to add service');
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to add service",
+      });
     }
   };
 
@@ -190,7 +222,11 @@ const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({
   const handleEditCategory = async (categoryId: number) => {
     try {
       if (!newCategoryName.trim() || !newCategoryIcon) {
-        toast.error('Please fill in all fields');
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Please fill in all fields",
+        });
         return;
       }
 
@@ -212,17 +248,28 @@ const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({
       setEditId(null);
       setNewCategoryName('');
       setNewCategoryIcon('');
-      toast.success('Category updated successfully');
+      toast({
+        title: "Success",
+        description: "Category updated successfully",
+      });
     } catch (error: any) {
       console.error('Error updating category:', error);
-      toast.error(error.response?.data?.message || 'Failed to update category');
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.response?.data?.message || 'Failed to update category',
+      });
     }
   };
 
   const handleEditService = async (serviceId: number) => {
     try {
       if (!newServiceName.trim() || !newServiceIcon || !selectedCategoryId) {
-        toast.error('Please fill in all fields');
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Please fill in all fields",
+        });
         return;
       }
 
@@ -246,10 +293,17 @@ const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({
       setNewServiceName('');
       setNewServiceIcon('');
       setSelectedCategoryId(null);
-      toast.success('Service updated successfully');
+      toast({
+        title: "Success",
+        description: "Service updated successfully",
+      });
     } catch (error: any) {
       console.error('Error updating service:', error);
-      toast.error(error.response?.data?.message || 'Failed to update service');
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.response?.data?.message || 'Failed to update service',
+      });
     }
   };
 
@@ -261,10 +315,17 @@ const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({
         }
       });
       setCategories(categories.filter(c => c.id !== categoryId));
-      toast.success('Category deleted successfully');
+      toast({
+        title: "Success",
+        description: "Category deleted successfully",
+      });
     } catch (error: any) {
       console.error('Error deleting category:', error);
-      toast.error(error.response?.data?.message || 'Failed to delete category');
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.response?.data?.message || 'Failed to delete category',
+      });
     }
   };
 
@@ -276,10 +337,17 @@ const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({
         }
       });
       setServices(services.filter(s => s.id !== serviceId));
-      toast.success('Service deleted successfully');
+      toast({
+        title: "Success",
+        description: "Service deleted successfully",
+      });
     } catch (error: any) {
       console.error('Error deleting service:', error);
-      toast.error(error.response?.data?.message || 'Failed to delete service');
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.response?.data?.message || 'Failed to delete service',
+      });
     }
   };
 

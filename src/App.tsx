@@ -49,6 +49,7 @@ import { ThemeProvider } from "./components/theme-provider";
 import { DeletedChanges } from './components/DeletedChanges';
 import { useCategoriesAndServices } from '@/hooks/useCategoriesAndServices';
 import { IconComponent } from './components/IconComponent';
+import { Toaster } from "@/components/ui/toaster";
 
 // Move fetchChanges outside of MainApp
 const fetchChanges = async () => {
@@ -596,6 +597,7 @@ const MainApp: React.FC = () => {
           </>
         )}
       </div>
+      <Toaster />
     </SidebarProvider>
   );
 };
@@ -624,6 +626,7 @@ const App: React.FC = () => {
               }
             />
           </Routes>
+          <Toaster />
         </AuthProvider>
       </BrowserRouter>
     </ThemeProvider>
