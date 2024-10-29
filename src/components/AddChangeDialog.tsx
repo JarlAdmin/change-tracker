@@ -166,7 +166,7 @@ const AddChangeDialog: React.FC<AddChangeDialogProps> = ({ isOpen, onClose, onAd
               </SelectContent>
             </Select>
           </div>
-          {selectedCategoryId && (
+          {selectedCategoryId && categories.find(c => c.id === selectedCategoryId)?.name !== 'General Changes' && (
             <div className="space-y-2">
               <Label htmlFor="service">Service*</Label>
               <Select value={service} onValueChange={setService}>

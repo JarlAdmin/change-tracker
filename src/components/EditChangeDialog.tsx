@@ -50,6 +50,12 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
     setSelectedCategoryId(category?.id || null);
   }, [categories, change.category]);
 
+  useEffect(() => {
+    if (category === 'General Changes') {
+      setService('General Change');
+    }
+  }, [category]);
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       const files = Array.from(event.target.files);
@@ -163,7 +169,7 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
               </SelectContent>
             </Select>
           </div>
-          {selectedCategoryId && (
+          {selectedCategoryId && categories.find(c => c.id === selectedCategoryId)?.name !== 'General Changes' && (
             <div className="space-y-2">
               <Label htmlFor="service">Service*</Label>
               <Select value={service} onValueChange={setService}>
