@@ -43,7 +43,9 @@ import {
   Wifi,
   Radio,
   Cog,
+  Trash2,
 } from "lucide-react";
+import { useAuth } from '@/contexts/AuthContext';
 
 interface CategoryServiceManagementProps {
   isOpen: boolean;
@@ -99,6 +101,8 @@ const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({
   const [newServiceName, setNewServiceName] = useState('');
   const [newServiceIcon, setNewServiceIcon] = useState('');
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
+  const { user } = useAuth();
+  const isAdmin = user?.username === 'Admin';
 
   useEffect(() => {
     if (isOpen) {
@@ -176,6 +180,28 @@ const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({
     return IconFound ? <IconFound className="h-4 w-4" /> : null;
   };
 
+  const handleDeleteCategory = async (categoryId: number) => {
+    try {
+      await axios.delete(`http://10.85.0.100:3001/api/categories/${categoryId}`);
+      setCategories(categories.filter(c => c.id !== categoryId));
+      toast.success('Category deleted successfully');
+    } catch (error: any) {
+      console.error('Error deleting category:', error);
+      toast.error(error.response?.data?.message || 'Failed to delete category');
+    }
+  };
+
+  const handleDeleteService = async (serviceId: number) => {
+    try {
+      await axios.delete(`http://10.85.0.100:3001/api/services/${serviceId}`);
+      setServices(services.filter(s => s.id !== serviceId));
+      toast.success('Service deleted successfully');
+    } catch (error: any) {
+      console.error('Error deleting service:', error);
+      toast.error(error.response?.data?.message || 'Failed to delete service');
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[600px]">
@@ -245,6 +271,16 @@ const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({
                       <IconComponent iconName={category.icon} />
                       <span>{category.name}</span>
                     </div>
+                    {isAdmin && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDeleteCategory(category.id)}
+                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
                   </div>
                 ))}
               </div>
@@ -332,6 +368,16 @@ const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({
                           </span>
                         )}
                       </div>
+                      {isAdmin && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDeleteService(service.id)}
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
                     </div>
                   );
                 })}
