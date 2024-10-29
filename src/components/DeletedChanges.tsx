@@ -11,11 +11,22 @@ import {
   TableRow,
 } from "./ui/table";
 import { Button } from "./ui/button";
-import { Undo2, Eye, ArrowLeft } from "lucide-react";
+import { Undo2, Eye, ArrowLeft, Trash2 } from "lucide-react";
 import { toast } from 'react-hot-toast';
 import ViewChangeDialog from './ViewChangeDialog';
 import { CategoryWithIcon, ServiceWithIcon } from './ServiceIcon';
 import { UserAvatar } from './UserAvatar';
+import { useAuth } from '@/contexts/AuthContext';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface DeletedChangesProps {
   onChangeRestored: () => void;
@@ -26,7 +37,10 @@ export function DeletedChanges({ onChangeRestored }: DeletedChangesProps) {
   const [deletedChanges, setDeletedChanges] = useState<Change[]>([]);
   const [selectedChange, setSelectedChange] = useState<Change | null>(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [users, setUsers] = useState<Array<{ id: number; username: string }>>([]);
+  const { user } = useAuth();
+  const isAdmin = user?.username === 'Admin';
 
   const fetchDeletedChanges = async () => {
     try {
@@ -61,6 +75,22 @@ export function DeletedChanges({ onChangeRestored }: DeletedChangesProps) {
     } catch (error) {
       console.error('Error restoring change:', error);
       toast.error('Failed to restore change');
+    }
+  };
+
+  const handlePermanentDelete = async (id: number) => {
+    try {
+      await axios.delete(`http://10.85.0.100:3001/api/changes/${id}/permanent`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      toast.success('Change permanently deleted');
+      setIsDeleteDialogOpen(false);
+      fetchDeletedChanges();
+    } catch (error: any) {
+      console.error('Error permanently deleting change:', error);
+      toast.error(error.response?.data?.message || 'Failed to delete change permanently');
     }
   };
 
@@ -145,6 +175,20 @@ export function DeletedChanges({ onChangeRestored }: DeletedChangesProps) {
                     >
                       <Undo2 className="h-4 w-4" />
                     </Button>
+                    {isAdmin && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          setSelectedChange(change);
+                          setIsDeleteDialogOpen(true);
+                        }}
+                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                        title="Permanently Delete"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
                   </div>
                 </TableCell>
               </TableRow>
@@ -161,14 +205,37 @@ export function DeletedChanges({ onChangeRestored }: DeletedChangesProps) {
       </div>
 
       {selectedChange && (
-        <ViewChangeDialog
-          isOpen={isViewDialogOpen}
-          onClose={() => {
-            setIsViewDialogOpen(false);
-            setSelectedChange(null);  // Reset selectedChange when closing dialog
-          }}
-          change={selectedChange}
-        />
+        <>
+          <ViewChangeDialog
+            isOpen={isViewDialogOpen}
+            onClose={() => {
+              setIsViewDialogOpen(false);
+              setSelectedChange(null);
+            }}
+            change={selectedChange}
+          />
+
+          <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete the change
+                  and all associated screenshots.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => handlePermanentDelete(selectedChange.id)}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  Delete Permanently
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </>
       )}
     </div>
   );
