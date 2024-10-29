@@ -53,14 +53,14 @@ export function AppSidebar({ onUserAdded }: AppSidebarProps) {
 
   return (
     <Sidebar>
-      <SidebarHeader className="border-b">
+      <SidebarHeader className="border-b p-2">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton className="flex items-center gap-2">
+            <SidebarMenuButton className="flex items-center gap-2 py-1">
               <ClipboardList className="h-6 w-6" />
-              <div className="flex flex-col">
-                <span className="font-semibold">Change Tracker</span>
-                <span className="text-xs text-muted-foreground">Track your changes</span>
+              <div className="flex flex-col gap-0.5">
+                <span className="font-semibold leading-none">Change Tracker</span>
+                <span className="text-xs text-muted-foreground leading-none">Track your changes</span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
