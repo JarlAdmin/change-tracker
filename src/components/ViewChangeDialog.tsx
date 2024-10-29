@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -7,6 +7,8 @@ import {
 } from "./ui/dialog";
 import { Change } from '../types/change';
 import { CategoryWithIcon, ServiceWithIcon } from './ServiceIcon';
+import { UserAvatar } from './UserAvatar';
+import axios from 'axios';
 
 interface ViewChangeDialogProps {
   isOpen: boolean;
@@ -15,8 +17,23 @@ interface ViewChangeDialogProps {
 }
 
 const ViewChangeDialog: React.FC<ViewChangeDialogProps> = ({ isOpen, onClose, change }) => {
-  // Ensure screenshots is always an array, even if undefined
+  const [user, setUser] = useState<{ id: number; username: string } | null>(null);
   const screenshots = change.screenshots || [];
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await axios.get(`http://10.85.0.100:3001/api/users/${change.user_id}`);
+        setUser(response.data);
+      } catch (error) {
+        console.error('Error fetching user:', error);
+      }
+    };
+
+    if (change.user_id) {
+      fetchUser();
+    }
+  }, [change.user_id]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -41,9 +58,20 @@ const ViewChangeDialog: React.FC<ViewChangeDialogProps> = ({ isOpen, onClose, ch
               <ServiceWithIcon category={change.category} service={change.service} />
             </div>
           </div>
-          <div>
-            <h3 className="font-semibold mb-1">Date</h3>
-            <p>{new Date(change.date).toLocaleString()}</p>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <h3 className="font-semibold mb-1">Date</h3>
+              <p>{new Date(change.date).toLocaleString()}</p>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-1">User</h3>
+              {user && (
+                <div className="flex items-center gap-2">
+                  <UserAvatar username={user.username} />
+                  <span>{user.username}</span>
+                </div>
+              )}
+            </div>
           </div>
           {screenshots.length > 0 && (
             <div>
