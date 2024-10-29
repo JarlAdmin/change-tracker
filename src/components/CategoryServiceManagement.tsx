@@ -410,7 +410,7 @@ const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({
                         )}
                       </SelectValue>
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="max-h-[200px]">
                       {AVAILABLE_ICONS.map((icon) => (
                         <SelectItem key={icon.name} value={icon.name}>
                           <div className="flex items-center gap-2">
@@ -428,7 +428,7 @@ const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({
 
             <div className="border rounded-md p-4">
               <h4 className="font-semibold mb-2">Existing Categories</h4>
-              <div className="space-y-2">
+              <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2">
                 {categories.map((category) => (
                   <div
                     key={category.id}
@@ -446,7 +446,7 @@ const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({
                           <SelectTrigger className="w-[180px]">
                             <SelectValue placeholder="Select icon" />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className="max-h-[200px]">
                             {AVAILABLE_ICONS.map((icon) => (
                               <SelectItem key={icon.name} value={icon.name}>
                                 <div className="flex items-center gap-2">
@@ -561,7 +561,7 @@ const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({
                         )}
                       </SelectValue>
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="max-h-[200px]">
                       {AVAILABLE_ICONS.map((icon) => (
                         <SelectItem key={icon.name} value={icon.name}>
                           <div className="flex items-center gap-2">
@@ -579,7 +579,7 @@ const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({
 
             <div className="border rounded-md p-4">
               <h4 className="font-semibold mb-2">Existing Services</h4>
-              <div className="space-y-2">
+              <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2">
                 {services.map((service) => {
                   const category = categories.find(c => c.id === service.category_id);
                   return (
@@ -602,7 +602,7 @@ const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({
                             <SelectTrigger>
                               <SelectValue placeholder="Select category" />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="max-h-[200px]">
                               {categories.map((cat) => (
                                 <SelectItem key={cat.id} value={cat.id.toString()}>
                                   <div className="flex items-center gap-2">
@@ -617,7 +617,7 @@ const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({
                             <SelectTrigger className="w-[180px]">
                               <SelectValue placeholder="Select icon" />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="max-h-[200px]">
                               {AVAILABLE_ICONS.map((icon) => (
                                 <SelectItem key={icon.name} value={icon.name}>
                                   <div className="flex items-center gap-2">
