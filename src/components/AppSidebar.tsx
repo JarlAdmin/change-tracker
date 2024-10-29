@@ -44,7 +44,7 @@ const items = [
     icon: Trash2,
   },
   {
-    title: "Category & Service Management",
+    title: "Categories",
     icon: Settings,
   },
 ];
