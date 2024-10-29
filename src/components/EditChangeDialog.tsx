@@ -69,10 +69,6 @@ const EditChangeDialog: React.FC<EditChangeDialogProps> = ({ isOpen, onClose, on
       setError("Please fill in all required fields (Change Details and Category)");
       return;
     }
-    if (category !== 'General Changes' && !service) {
-      setError("Please select a service for the chosen category");
-      return;
-    }
 
     const formData = new FormData();
     formData.append('change_details', changeDetails);

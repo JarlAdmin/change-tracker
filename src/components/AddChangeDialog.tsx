@@ -84,10 +84,6 @@ const AddChangeDialog: React.FC<AddChangeDialogProps> = ({ isOpen, onClose, onAd
       setError("Please fill in all required fields (Change Details, Category, and User).");
       return;
     }
-    if (category !== 'General Changes' && !service) {
-      setError("Please select a service for the chosen category.");
-      return;
-    }
 
     const formData = new FormData();
     formData.append('change_details', changeDetails);
@@ -96,8 +92,6 @@ const AddChangeDialog: React.FC<AddChangeDialogProps> = ({ isOpen, onClose, onAd
     formData.append('date', changeDate.toISOString());
     formData.append('user_id', userId.toString());
     screenshots.forEach(file => formData.append('screenshots', file));
-
-    console.log('Submitting form data:', Object.fromEntries(formData));
 
     onAddChange(formData);
     handleClose();
