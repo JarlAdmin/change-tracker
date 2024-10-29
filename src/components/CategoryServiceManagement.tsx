@@ -107,6 +107,10 @@ const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({
   const { user } = useAuth();
   const isAdmin = user?.username === 'Admin';
 
+  // Add edit mode states
+  const [editMode, setEditMode] = useState<'category' | 'service' | null>(null);
+  const [editId, setEditId] = useState<number | null>(null);
+
   useEffect(() => {
     if (isOpen) {
       fetchCategories();
@@ -183,14 +187,29 @@ const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({
     return IconFound ? <IconFound className="h-4 w-4" /> : null;
   };
 
-  const handleEditCategory = async (category: Category) => {
+  const handleEditCategory = async (categoryId: number) => {
     try {
-      const response = await axios.put(`http://10.85.0.100:3001/api/categories/${category.id}`, {
-        name: newCategoryName || category.name,
-        icon: newCategoryIcon || category.icon
-      });
-      setCategories(categories.map(c => c.id === category.id ? response.data : c));
-      setEditingCategory(null);
+      if (!newCategoryName.trim() || !newCategoryIcon) {
+        toast.error('Please fill in all fields');
+        return;
+      }
+
+      const response = await axios.put(
+        `http://10.85.0.100:3001/api/categories/${categoryId}`,
+        {
+          name: newCategoryName,
+          icon: newCategoryIcon
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        }
+      );
+
+      setCategories(categories.map(c => c.id === categoryId ? response.data : c));
+      setEditMode(null);
+      setEditId(null);
       setNewCategoryName('');
       setNewCategoryIcon('');
       toast.success('Category updated successfully');
@@ -200,15 +219,30 @@ const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({
     }
   };
 
-  const handleEditService = async (service: Service) => {
+  const handleEditService = async (serviceId: number) => {
     try {
-      const response = await axios.put(`http://10.85.0.100:3001/api/services/${service.id}`, {
-        name: newServiceName || service.name,
-        icon: newServiceIcon || service.icon,
-        category_id: selectedCategoryId || service.category_id
-      });
-      setServices(services.map(s => s.id === service.id ? response.data : s));
-      setEditingService(null);
+      if (!newServiceName.trim() || !newServiceIcon || !selectedCategoryId) {
+        toast.error('Please fill in all fields');
+        return;
+      }
+
+      const response = await axios.put(
+        `http://10.85.0.100:3001/api/services/${serviceId}`,
+        {
+          name: newServiceName,
+          icon: newServiceIcon,
+          category_id: selectedCategoryId
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        }
+      );
+
+      setServices(services.map(s => s.id === serviceId ? response.data : s));
+      setEditMode(null);
+      setEditId(null);
       setNewServiceName('');
       setNewServiceIcon('');
       setSelectedCategoryId(null);
@@ -314,33 +348,81 @@ const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({
                     key={category.id}
                     className="flex items-center justify-between p-2 bg-muted rounded-md"
                   >
-                    <div className="flex items-center gap-2">
-                      <IconComponent iconName={category.icon} />
-                      <span>{category.name}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => {
-                          setEditingCategory(category);
-                          setNewCategoryName(category.name);
-                          setNewCategoryIcon(category.icon);
-                        }}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      {isAdmin && (
+                    {editMode === 'category' && editId === category.id ? (
+                      <div className="flex-1 flex items-center gap-2">
+                        <Input
+                          value={newCategoryName}
+                          onChange={(e) => setNewCategoryName(e.target.value)}
+                          placeholder="Category name"
+                          className="flex-1"
+                        />
+                        <Select value={newCategoryIcon} onValueChange={setNewCategoryIcon}>
+                          <SelectTrigger className="w-[180px]">
+                            <SelectValue placeholder="Select icon" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {AVAILABLE_ICONS.map((icon) => (
+                              <SelectItem key={icon.name} value={icon.name}>
+                                <div className="flex items-center gap-2">
+                                  <icon.component className="h-4 w-4" />
+                                  <span>{icon.name}</span>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEditCategory(category.id)}
+                        >
+                          Save
+                        </Button>
                         <Button
                           variant="ghost"
-                          size="icon"
-                          onClick={() => handleDeleteCategory(category.id)}
-                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                          size="sm"
+                          onClick={() => {
+                            setEditMode(null);
+                            setEditId(null);
+                            setNewCategoryName('');
+                            setNewCategoryIcon('');
+                          }}
                         >
-                          <Trash2 className="h-4 w-4" />
+                          Cancel
                         </Button>
-                      )}
-                    </div>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="flex items-center gap-2">
+                          <IconComponent iconName={category.icon} />
+                          <span>{category.name}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                              setEditMode('category');
+                              setEditId(category.id);
+                              setNewCategoryName(category.name);
+                              setNewCategoryIcon(category.icon);
+                            }}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          {isAdmin && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleDeleteCategory(category.id)}
+                              className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                      </>
+                    )}
                   </div>
                 ))}
               </div>
@@ -419,39 +501,106 @@ const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({
                       key={service.id}
                       className="flex items-center justify-between p-2 bg-muted rounded-md"
                     >
-                      <div className="flex items-center gap-2">
-                        <IconComponent iconName={service.icon} />
-                        <span>{service.name}</span>
-                        {category && (
-                          <span className="text-sm text-muted-foreground">
-                            ({category.name})
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => {
-                            setEditingService(service);
-                            setNewServiceName(service.name);
-                            setNewServiceIcon(service.icon);
-                            setSelectedCategoryId(service.category_id);
-                          }}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        {isAdmin && (
+                      {editMode === 'service' && editId === service.id ? (
+                        <div className="flex-1 flex items-center gap-2">
+                          <Input
+                            value={newServiceName}
+                            onChange={(e) => setNewServiceName(e.target.value)}
+                            placeholder="Service name"
+                            className="flex-1"
+                          />
+                          <Select
+                            value={selectedCategoryId?.toString()}
+                            onValueChange={(value) => setSelectedCategoryId(Number(value))}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select category" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {categories.map((cat) => (
+                                <SelectItem key={cat.id} value={cat.id.toString()}>
+                                  <div className="flex items-center gap-2">
+                                    <IconComponent iconName={cat.icon} />
+                                    <span>{cat.name}</span>
+                                  </div>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Select value={newServiceIcon} onValueChange={setNewServiceIcon}>
+                            <SelectTrigger className="w-[180px]">
+                              <SelectValue placeholder="Select icon" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {AVAILABLE_ICONS.map((icon) => (
+                                <SelectItem key={icon.name} value={icon.name}>
+                                  <div className="flex items-center gap-2">
+                                    <icon.component className="h-4 w-4" />
+                                    <span>{icon.name}</span>
+                                  </div>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEditService(service.id)}
+                          >
+                            Save
+                          </Button>
                           <Button
                             variant="ghost"
-                            size="icon"
-                            onClick={() => handleDeleteService(service.id)}
-                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                            size="sm"
+                            onClick={() => {
+                              setEditMode(null);
+                              setEditId(null);
+                              setNewServiceName('');
+                              setNewServiceIcon('');
+                              setSelectedCategoryId(null);
+                            }}
                           >
-                            <Trash2 className="h-4 w-4" />
+                            Cancel
                           </Button>
-                        )}
-                      </div>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="flex items-center gap-2">
+                            <IconComponent iconName={service.icon} />
+                            <span>{service.name}</span>
+                            {category && (
+                              <span className="text-sm text-muted-foreground">
+                                ({category.name})
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => {
+                                setEditMode('service');
+                                setEditId(service.id);
+                                setNewServiceName(service.name);
+                                setNewServiceIcon(service.icon);
+                                setSelectedCategoryId(service.category_id);
+                              }}
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            {isAdmin && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleDeleteService(service.id)}
+                                className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
+                        </>
+                      )}
                     </div>
                   );
                 })}
