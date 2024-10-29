@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Home, Users, LogOut, ChevronUp, ClipboardList } from "lucide-react";
+import { Home, Users, LogOut, ChevronUp, ClipboardList, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sidebar,
@@ -30,12 +30,17 @@ import { ModeToggle } from './mode-toggle';
 const items = [
   {
     title: "Dashboard",
-    url: "#",
+    url: "/",
     icon: Home,
   },
   {
     title: "User Management",
     icon: Users,
+  },
+  {
+    title: "Deleted Changes",
+    url: "/deleted",
+    icon: Trash2,
   },
 ];
 

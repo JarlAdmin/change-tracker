@@ -46,6 +46,19 @@ import {
   ChevronsRight, // Changed from DoubleArrowRight
 } from "lucide-react";
 import { ThemeProvider } from "./components/theme-provider";
+import { DeletedChanges } from './components/DeletedChanges';
+
+// Move fetchChanges outside of MainApp
+const fetchChanges = async () => {
+  try {
+    const response = await axios.get('http://10.85.0.100:3001/api/changes');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching changes:', error);
+    toast.error('Failed to fetch changes');
+    return [];
+  }
+};
 
 // Protected Route component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -98,24 +111,8 @@ const MainApp: React.FC = () => {
 
   useEffect(() => {
     fetchUsers();
-    fetchChanges();
+    fetchChanges().then(data => setChanges(data));
   }, []);
-
-  const fetchChanges = async () => {
-    try {
-      const response = await axios.get('http://10.85.0.100:3001/api/changes');
-      console.log('Changes response:', response.data);
-      setChanges(response.data);
-    } catch (error) {
-      console.error('Error fetching changes:', error);
-      if (axios.isAxiosError(error) && error.response?.status === 401) {
-        toast.error('Session expired. Please login again.');
-        logout();
-      } else {
-        toast.error('Failed to fetch changes');
-      }
-    }
-  };
 
   const addChange = async (changeData: FormData) => {
     try {
@@ -591,7 +588,7 @@ const MainApp: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <ThemeProvider defaultTheme="light"> {/* Changed from "system" to "light" */}
+    <ThemeProvider defaultTheme="light">
       <BrowserRouter>
         <AuthProvider>
           <Routes>
@@ -601,6 +598,14 @@ const App: React.FC = () => {
               element={
                 <ProtectedRoute>
                   <MainApp />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/deleted"
+              element={
+                <ProtectedRoute>
+                  <DeletedChanges onChangeRestored={fetchChanges} />
                 </ProtectedRoute>
               }
             />
