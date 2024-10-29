@@ -54,6 +54,72 @@ import {
   Globe,
   ShieldCheck,
   Layers,
+  Blocks,
+  Binary,
+  Braces,
+  Bug,
+  Cable,
+  CircuitBoard,
+  Clipboard,
+  ClipboardCheck,
+  Command,
+  Component,
+  Container,
+  Factory,
+  FileJson,
+  FileLock,
+  FileTerminal,
+  Filter,
+  Fingerprint,
+  Flame,
+  FolderGit,
+  FolderKanban,
+  FolderSync,
+  GitBranch,
+  GitCommit,
+  GitMerge,
+  GitPullRequest,
+  Hammer,
+  Hash,
+  HeartPulse,
+  History,
+  Infinity,
+  LayoutGrid,
+  Library,
+  Link,
+  ListChecks,
+  Loader,
+  Microscope,
+  PackageCheck,
+  PackageOpen,
+  PackagePlus,
+  PackageSearch,
+  Puzzle,
+  QrCode,
+  RefreshCcw,
+  Replace,
+  Satellite,
+  Scale,
+  Scan,
+  Search,
+  Signal,
+  Sliders,
+  SplitSquareVertical,
+  Table,
+  TabletSmartphone,
+  TerminalSquare,
+  Timer,
+  ToggleLeft,
+  ToggleRight,
+  Unplug,
+  Upload,
+  Variable,
+  Verified,
+  Webhook,
+  WifiOff,
+  Wrench,
+  Zap,
+  LucideIcon,
 } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -75,7 +141,12 @@ interface Service {
   category_id: number;
 }
 
-const AVAILABLE_ICONS = [
+interface IconItem {
+  name: string;
+  component: LucideIcon;
+}
+
+const AVAILABLE_ICONS: IconItem[] = [
   { name: 'Server', component: Server },
   { name: 'Database', component: Database },
   { name: 'Cloud', component: Cloud },
@@ -107,6 +178,69 @@ const AVAILABLE_ICONS = [
   { name: 'Globe', component: Globe },
   { name: 'ShieldCheck', component: ShieldCheck },
   { name: 'Layers', component: Layers },
+  { name: 'Blocks', component: Blocks },
+  { name: 'Binary', component: Binary },
+  { name: 'Braces', component: Braces },
+  { name: 'Bug', component: Bug },
+  { name: 'Cable', component: Cable },
+  { name: 'CircuitBoard', component: CircuitBoard },
+  { name: 'ClipboardCheck', component: ClipboardCheck },
+  { name: 'Command', component: Command },
+  { name: 'Component', component: Component },
+  { name: 'Container', component: Container },
+  { name: 'Factory', component: Factory },
+  { name: 'FileJson', component: FileJson },
+  { name: 'FileLock', component: FileLock },
+  { name: 'FileTerminal', component: FileTerminal },
+  { name: 'Filter', component: Filter },
+  { name: 'Fingerprint', component: Fingerprint },
+  { name: 'Flame', component: Flame },
+  { name: 'FolderGit', component: FolderGit },
+  { name: 'FolderKanban', component: FolderKanban },
+  { name: 'FolderSync', component: FolderSync },
+  { name: 'GitBranch', component: GitBranch },
+  { name: 'GitCommit', component: GitCommit },
+  { name: 'GitMerge', component: GitMerge },
+  { name: 'GitPullRequest', component: GitPullRequest },
+  { name: 'Hammer', component: Hammer },
+  { name: 'Hash', component: Hash },
+  { name: 'HeartPulse', component: HeartPulse },
+  { name: 'History', component: History },
+  { name: 'Infinity', component: Infinity },
+  { name: 'LayoutGrid', component: LayoutGrid },
+  { name: 'Library', component: Library },
+  { name: 'Link', component: Link },
+  { name: 'ListChecks', component: ListChecks },
+  { name: 'Loader', component: Loader },
+  { name: 'Microscope', component: Microscope },
+  { name: 'PackageCheck', component: PackageCheck },
+  { name: 'PackageOpen', component: PackageOpen },
+  { name: 'PackagePlus', component: PackagePlus },
+  { name: 'PackageSearch', component: PackageSearch },
+  { name: 'Puzzle', component: Puzzle },
+  { name: 'QrCode', component: QrCode },
+  { name: 'RefreshCcw', component: RefreshCcw },
+  { name: 'Replace', component: Replace },
+  { name: 'Satellite', component: Satellite },
+  { name: 'Scale', component: Scale },
+  { name: 'Scan', component: Scan },
+  { name: 'Signal', component: Signal },
+  { name: 'Sliders', component: Sliders },
+  { name: 'SplitSquareVertical', component: SplitSquareVertical },
+  { name: 'Table', component: Table },
+  { name: 'TabletSmartphone', component: TabletSmartphone },
+  { name: 'TerminalSquare', component: TerminalSquare },
+  { name: 'Timer', component: Timer },
+  { name: 'ToggleLeft', component: ToggleLeft },
+  { name: 'ToggleRight', component: ToggleRight },
+  { name: 'Unplug', component: Unplug },
+  { name: 'Upload', component: Upload },
+  { name: 'Variable', component: Variable },
+  { name: 'Verified', component: Verified },
+  { name: 'Webhook', component: Webhook },
+  { name: 'WifiOff', component: WifiOff },
+  { name: 'Wrench', component: Wrench },
+  { name: 'Zap', component: Zap },
 ];
 
 const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({
@@ -232,9 +366,10 @@ const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({
     }
   };
 
-  const IconComponent = ({ iconName }: { iconName: string }) => {
+  const IconDisplay = ({ iconName }: { iconName: string }) => {
     const IconFound = AVAILABLE_ICONS.find(icon => icon.name === iconName)?.component;
-    return IconFound ? <IconFound className="h-4 w-4" /> : null;
+    if (!IconFound) return null;
+    return React.createElement(IconFound, { className: "h-4 w-4" });
   };
 
   const handleEditCategory = async (categoryId: number) => {
@@ -404,7 +539,7 @@ const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({
                       <SelectValue placeholder="Select icon">
                         {newCategoryIcon && (
                           <div className="flex items-center gap-2">
-                            <IconComponent iconName={newCategoryIcon} />
+                            <IconDisplay iconName={newCategoryIcon} />
                             <span>{newCategoryIcon}</span>
                           </div>
                         )}
@@ -414,7 +549,7 @@ const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({
                       {AVAILABLE_ICONS.map((icon) => (
                         <SelectItem key={icon.name} value={icon.name}>
                           <div className="flex items-center gap-2">
-                            <icon.component className="h-4 w-4" />
+                            <IconDisplay iconName={icon.name} />
                             <span>{icon.name}</span>
                           </div>
                         </SelectItem>
@@ -450,7 +585,7 @@ const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({
                             {AVAILABLE_ICONS.map((icon) => (
                               <SelectItem key={icon.name} value={icon.name}>
                                 <div className="flex items-center gap-2">
-                                  <icon.component className="h-4 w-4" />
+                                  <IconDisplay iconName={icon.name} />
                                   <span>{icon.name}</span>
                                 </div>
                               </SelectItem>
@@ -480,7 +615,7 @@ const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({
                     ) : (
                       <>
                         <div className="flex items-center gap-2">
-                          <IconComponent iconName={category.icon} />
+                          <IconDisplay iconName={category.icon} />
                           <span>{category.name}</span>
                         </div>
                         <div className="flex items-center gap-2">
@@ -540,7 +675,7 @@ const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({
                       {categories.map((category) => (
                         <SelectItem key={category.id} value={category.id.toString()}>
                           <div className="flex items-center gap-2">
-                            <IconComponent iconName={category.icon} />
+                            <IconDisplay iconName={category.icon} />
                             <span>{category.name}</span>
                           </div>
                         </SelectItem>
@@ -555,7 +690,7 @@ const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({
                       <SelectValue placeholder="Select icon">
                         {newServiceIcon && (
                           <div className="flex items-center gap-2">
-                            <IconComponent iconName={newServiceIcon} />
+                            <IconDisplay iconName={newServiceIcon} />
                             <span>{newServiceIcon}</span>
                           </div>
                         )}
@@ -565,7 +700,7 @@ const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({
                       {AVAILABLE_ICONS.map((icon) => (
                         <SelectItem key={icon.name} value={icon.name}>
                           <div className="flex items-center gap-2">
-                            <icon.component className="h-4 w-4" />
+                            <IconDisplay iconName={icon.name} />
                             <span>{icon.name}</span>
                           </div>
                         </SelectItem>
@@ -606,7 +741,7 @@ const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({
                               {categories.map((cat) => (
                                 <SelectItem key={cat.id} value={cat.id.toString()}>
                                   <div className="flex items-center gap-2">
-                                    <IconComponent iconName={cat.icon} />
+                                    <IconDisplay iconName={cat.icon} />
                                     <span>{cat.name}</span>
                                   </div>
                                 </SelectItem>
@@ -621,7 +756,7 @@ const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({
                               {AVAILABLE_ICONS.map((icon) => (
                                 <SelectItem key={icon.name} value={icon.name}>
                                   <div className="flex items-center gap-2">
-                                    <icon.component className="h-4 w-4" />
+                                    <IconDisplay iconName={icon.name} />
                                     <span>{icon.name}</span>
                                   </div>
                                 </SelectItem>
@@ -652,7 +787,7 @@ const CategoryServiceManagement: React.FC<CategoryServiceManagementProps> = ({
                       ) : (
                         <>
                           <div className="flex items-center gap-2">
-                            <IconComponent iconName={service.icon} />
+                            <IconDisplay iconName={service.icon} />
                             <span>{service.name}</span>
                             {category && (
                               <span className="text-sm text-muted-foreground">
