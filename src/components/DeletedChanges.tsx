@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Change } from '../types/change';
+import { useNavigate } from 'react-router-dom';
 import {
   Table,
   TableBody,
@@ -10,7 +11,7 @@ import {
   TableRow,
 } from "./ui/table";
 import { Button } from "./ui/button";
-import { Undo2, Eye } from "lucide-react";
+import { Undo2, Eye, ArrowLeft } from "lucide-react";
 import { toast } from 'react-hot-toast';
 import ViewChangeDialog from './ViewChangeDialog';
 import { CategoryWithIcon, ServiceWithIcon } from './ServiceIcon';
@@ -21,6 +22,7 @@ interface DeletedChangesProps {
 }
 
 export function DeletedChanges({ onChangeRestored }: DeletedChangesProps) {
+  const navigate = useNavigate();
   const [deletedChanges, setDeletedChanges] = useState<Change[]>([]);
   const [selectedChange, setSelectedChange] = useState<Change | null>(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
@@ -64,7 +66,20 @@ export function DeletedChanges({ onChangeRestored }: DeletedChangesProps) {
 
   return (
     <div className="p-4">
-      <h2 className="text-2xl font-bold mb-4">Deleted Changes</h2>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-4">
+          <Button 
+            variant="outline" 
+            onClick={() => navigate('/')}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Dashboard
+          </Button>
+          <h2 className="text-2xl font-bold">Deleted Changes</h2>
+        </div>
+      </div>
+
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -118,6 +133,7 @@ export function DeletedChanges({ onChangeRestored }: DeletedChangesProps) {
                         setSelectedChange(change);
                         setIsViewDialogOpen(true);
                       }}
+                      title="View Change"
                     >
                       <Eye className="h-4 w-4" />
                     </Button>
@@ -125,6 +141,7 @@ export function DeletedChanges({ onChangeRestored }: DeletedChangesProps) {
                       variant="ghost"
                       size="icon"
                       onClick={() => handleRestore(change.id)}
+                      title="Restore Change"
                     >
                       <Undo2 className="h-4 w-4" />
                     </Button>
@@ -146,7 +163,10 @@ export function DeletedChanges({ onChangeRestored }: DeletedChangesProps) {
       {selectedChange && (
         <ViewChangeDialog
           isOpen={isViewDialogOpen}
-          onClose={() => setIsViewDialogOpen(false)}
+          onClose={() => {
+            setIsViewDialogOpen(false);
+            setSelectedChange(null);  // Reset selectedChange when closing dialog
+          }}
           change={selectedChange}
         />
       )}
