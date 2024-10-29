@@ -46,6 +46,7 @@ const items = [
   {
     title: "Categories",
     icon: Settings,
+    action: 'category-management'
   },
 ];
 
@@ -91,7 +92,7 @@ export function AppSidebar({ onUserAdded }: AppSidebarProps) {
                       <item.icon className="mr-2 h-4 w-4" />
                       <span>{item.title}</span>
                     </SidebarMenuButton>
-                  ) : item.title === "Category & Service Management" ? (
+                  ) : item.action === 'category-management' ? (
                     <SidebarMenuButton onClick={() => setIsCategoryServiceManagementOpen(true)}>
                       <item.icon className="mr-2 h-4 w-4" />
                       <span>{item.title}</span>
