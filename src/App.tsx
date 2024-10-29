@@ -47,6 +47,8 @@ import {
 } from "lucide-react";
 import { ThemeProvider } from "./components/theme-provider";
 import { DeletedChanges } from './components/DeletedChanges';
+import { useCategoriesAndServices } from '@/hooks/useCategoriesAndServices';
+import { IconComponent } from './components/IconComponent';
 
 // Move fetchChanges outside of MainApp
 const fetchChanges = async () => {
@@ -81,6 +83,7 @@ const MainApp: React.FC = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const { logout } = useAuth();
+  const { categories, services } = useCategoriesAndServices();
 
   // Add error interceptor for axios
   useEffect(() => {
@@ -244,9 +247,16 @@ const MainApp: React.FC = () => {
           </Button>
         )
       },
-      cell: ({ row }) => (
-        <CategoryWithIcon category={row.getValue("category")} />
-      ),
+      cell: ({ row }) => {
+        const categoryName = row.getValue("category") as string;
+        const category = categories.find(c => c.name === categoryName);
+        return (
+          <div className="flex items-center gap-2">
+            {category && <IconComponent iconName={category.icon} />}
+            <span>{categoryName}</span>
+          </div>
+        );
+      },
     },
     {
       accessorKey: "service",
@@ -261,12 +271,16 @@ const MainApp: React.FC = () => {
           </Button>
         )
       },
-      cell: ({ row }) => (
-        <ServiceWithIcon 
-          category={row.getValue("category")} 
-          service={row.getValue("service")} 
-        />
-      ),
+      cell: ({ row }) => {
+        const serviceName = row.getValue("service") as string;
+        const service = services.find(s => s.name === serviceName);
+        return (
+          <div className="flex items-center gap-2">
+            {service && <IconComponent iconName={service.icon} />}
+            <span>{serviceName}</span>
+          </div>
+        );
+      },
     },
     {
       accessorKey: "user_id",

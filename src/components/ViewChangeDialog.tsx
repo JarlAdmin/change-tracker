@@ -9,6 +9,8 @@ import { Change } from '../types/change';
 import { CategoryWithIcon, ServiceWithIcon } from './ServiceIcon';
 import { UserAvatar } from './UserAvatar';
 import axios from 'axios';
+import { useCategoriesAndServices } from '@/hooks/useCategoriesAndServices';
+import { IconComponent } from './IconComponent';
 
 interface ViewChangeDialogProps {
   isOpen: boolean;
@@ -18,7 +20,11 @@ interface ViewChangeDialogProps {
 
 const ViewChangeDialog: React.FC<ViewChangeDialogProps> = ({ isOpen, onClose, change }) => {
   const [user, setUser] = useState<{ id: number; username: string } | null>(null);
+  const { categories, services } = useCategoriesAndServices();
   const screenshots = change.screenshots || [];
+
+  const category = categories.find(c => c.name === change.category);
+  const service = services.find(s => s.name === change.service);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -51,11 +57,17 @@ const ViewChangeDialog: React.FC<ViewChangeDialogProps> = ({ isOpen, onClose, ch
           <div className="grid grid-cols-2 gap-4">
             <div>
               <h3 className="font-semibold mb-1">Category</h3>
-              <CategoryWithIcon category={change.category} />
+              <div className="flex items-center gap-2">
+                {category && <IconComponent iconName={category.icon} />}
+                <span>{change.category}</span>
+              </div>
             </div>
             <div>
               <h3 className="font-semibold mb-1">Service</h3>
-              <ServiceWithIcon category={change.category} service={change.service} />
+              <div className="flex items-center gap-2">
+                {service && <IconComponent iconName={service.icon} />}
+                <span>{change.service}</span>
+              </div>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">

@@ -20,6 +20,8 @@ import axios from 'axios';
 import { UserAvatar } from './UserAvatar';
 import { ServiceIcon } from './ServiceIcon';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCategoriesAndServices } from '@/hooks/useCategoriesAndServices';
+import { IconComponent } from './IconComponent';
 
 interface AddChangeDialogProps {
   isOpen: boolean;
@@ -37,6 +39,8 @@ const AddChangeDialog: React.FC<AddChangeDialogProps> = ({ isOpen, onClose, onAd
   const [error, setError] = useState<string | null>(null);
   const [users, setUsers] = useState<Array<{ id: number, username: string }>>([]);
   const { user: currentUser } = useAuth();
+  const { categories, services, loading } = useCategoriesAndServices();
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
 
   useEffect(() => {
     fetchUsers();
@@ -144,33 +148,31 @@ const AddChangeDialog: React.FC<AddChangeDialogProps> = ({ isOpen, onClose, onAd
           </div>
           <div className="space-y-2">
             <Label htmlFor="category">Category*</Label>
-            <Select value={category} onValueChange={setCategory}>
+            <Select 
+              value={selectedCategoryId?.toString() || ''} 
+              onValueChange={(value) => {
+                const categoryId = Number(value);
+                setSelectedCategoryId(categoryId);
+                const category = categories.find(c => c.id === categoryId);
+                setCategory(category?.name || '');
+              }}
+            >
               <SelectTrigger id="category">
                 <SelectValue placeholder="Select Category" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Microsoft">
-                  <div className="flex items-center gap-2">
-                    <ServiceIcon category="Microsoft" />
-                    <span>Microsoft</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="On Premise">
-                  <div className="flex items-center gap-2">
-                    <ServiceIcon category="On Premise" />
-                    <span>On Premise</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="General Changes">
-                  <div className="flex items-center gap-2">
-                    <ServiceIcon category="General Changes" />
-                    <span>General Changes</span>
-                  </div>
-                </SelectItem>
+                {categories.map((cat) => (
+                  <SelectItem key={cat.id} value={cat.id.toString()}>
+                    <div className="flex items-center gap-2">
+                      <IconComponent iconName={cat.icon} />
+                      <span>{cat.name}</span>
+                    </div>
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
-          {(category === 'Microsoft' || category === 'On Premise') && (
+          {selectedCategoryId && (
             <div className="space-y-2">
               <Label htmlFor="service">Service*</Label>
               <Select value={service} onValueChange={setService}>
@@ -178,62 +180,16 @@ const AddChangeDialog: React.FC<AddChangeDialogProps> = ({ isOpen, onClose, onAd
                   <SelectValue placeholder="Select Service" />
                 </SelectTrigger>
                 <SelectContent>
-                  {category === 'Microsoft' && (
-                    <>
-                      <SelectItem value="Azure">
+                  {services
+                    .filter(s => s.category_id === selectedCategoryId)
+                    .map((service) => (
+                      <SelectItem key={service.id} value={service.name}>
                         <div className="flex items-center gap-2">
-                          <ServiceIcon category="Microsoft" service="Azure" />
-                          <span>Azure</span>
+                          <IconComponent iconName={service.icon} />
+                          <span>{service.name}</span>
                         </div>
                       </SelectItem>
-                      <SelectItem value="Intune">
-                        <div className="flex items-center gap-2">
-                          <ServiceIcon category="Microsoft" service="Intune" />
-                          <span>Intune</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="Exchange">
-                        <div className="flex items-center gap-2">
-                          <ServiceIcon category="Microsoft" service="Exchange" />
-                          <span>Exchange</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="Defender">
-                        <div className="flex items-center gap-2">
-                          <ServiceIcon category="Microsoft" service="Defender" />
-                          <span>Microsoft Defender</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="Entra">
-                        <div className="flex items-center gap-2">
-                          <ServiceIcon category="Microsoft" service="Entra" />
-                          <span>Microsoft Entra</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="Teams">
-                        <div className="flex items-center gap-2">
-                          <ServiceIcon category="Microsoft" service="Teams" />
-                          <span>Microsoft Teams</span>
-                        </div>
-                      </SelectItem>
-                    </>
-                  )}
-                  {category === 'On Premise' && (
-                    <>
-                      <SelectItem value="Active Directory">
-                        <div className="flex items-center gap-2">
-                          <ServiceIcon category="On Premise" service="Active Directory" />
-                          <span>Active Directory</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="Network">
-                        <div className="flex items-center gap-2">
-                          <ServiceIcon category="On Premise" service="Network" />
-                          <span>Network</span>
-                        </div>
-                      </SelectItem>
-                    </>
-                  )}
+                    ))}
                 </SelectContent>
               </Select>
             </div>
